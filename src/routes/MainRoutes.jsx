@@ -16,6 +16,7 @@ const DashboardDefault = Loadable(lazy(() => import('views/dashboard')));
 
 // sample page routing
 const AssignmentsDefault = Loadable(lazy(() => import('views/dashboard/Assignments')));
+const PersonalPageDefault = Loadable(lazy(() => import('views/dashboard/Personal')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -42,6 +43,15 @@ const MainRoutes = {
         {
           path: '',
           element: <AssignmentsDefault />
+        }
+      ]
+    },
+    {
+      path: 'personal',
+      children: [
+        {
+          path: '',
+          element: <PersonalPageDefault />
         }
       ]
     },

@@ -27,6 +27,14 @@ const dashboard = {
       icon: icons.IconDashboard,
       breadcrumbs: false
     },
+    {
+      id: 'personal',
+      title: 'Personel',
+      type: 'item',
+      url: '/personal',
+      icon: icons.IconDashboard,
+      breadcrumbs: false
+    },
   ]
 };
 
