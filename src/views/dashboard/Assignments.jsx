@@ -22,7 +22,7 @@ const rows = [
   createData('Gingerbread', 356, 16.0, 49, 3.9),
 ];
 
-const SamplePage = () => (
+const AssignmentsPage = () => (
   
   
 <MainCard title="Sample Card">
@@ -58,4 +58,4 @@ const SamplePage = () => (
   </MainCard>
 );
 
-export default SamplePage;
+export default AssignmentsPage;

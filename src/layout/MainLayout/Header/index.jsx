@@ -5,12 +5,10 @@ import { useTheme } from '@mui/material/styles';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import ButtonBase from '@mui/material/ButtonBase';
+import Typography from '@mui/material/Typography';
 
 // project imports
 import LogoSection from '../LogoSection';
-import SearchSection from './SearchSection';
-import NotificationSection from './NotificationSection';
-import ProfileSection from './ProfileSection';
 
 // assets
 import { IconMenu2 } from '@tabler/icons-react';
@@ -58,13 +56,28 @@ const Header = ({ handleLeftDrawerToggle }) => {
       </Box>
 
       {/* header search */}
-      <SearchSection />
+      <Box sx={{
+        width: '100%',
+      }}>
+        <Typography
+          variant="h3"
+          align='center'
+          sx={{
+            color: theme.palette.grey[500],
+            ml: 4,
+          }}
+        >
+          Spor Polisi Şube Müdürlüğü Görev Ödemelerini Atama Sistemi
+        </Typography>
+      </Box>
+
+      {/* <SearchSection />
       <Box sx={{ flexGrow: 1 }} />
-      <Box sx={{ flexGrow: 1 }} />
+      <Box sx={{ flexGrow: 1 }} /> */}
 
       {/* notification & profile */}
-      <NotificationSection />
-      <ProfileSection />
+      {/* <NotificationSection />
+      <ProfileSection /> */}
     </>
   );
 };

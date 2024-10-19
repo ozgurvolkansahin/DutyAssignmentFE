@@ -20,10 +20,10 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import GetAppTwoToneIcon from '@mui/icons-material/GetAppOutlined';
 import { insertDuties } from 'services/duty';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+
 // ===========================|| DASHBOARD DEFAULT - EARNING CARD ||=========================== //
 
-const EarningCard = ({ isLoading, totalDuties, subText }) => {
+const Gorevlendirmeler = ({ isLoading, totalDuties, subText }) => {
   const theme = useTheme();
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -89,31 +89,55 @@ const EarningCard = ({ isLoading, totalDuties, subText }) => {
                         ...theme.typography.commonAvatar,
                         ...theme.typography.largeAvatar,
                         bgcolor: 'secondary.800',
-                        mt: 1,
-                        cursor: ''
+                        mt: 1
                       }}
                     >
                       <img src={EarningIcon} alt="Notification" />
                     </Avatar>
+                  </Grid>
+                  <Grid item>
+                    <Avatar
+                      variant="rounded"
+                      sx={{
+                        ...theme.typography.commonAvatar,
+                        ...theme.typography.mediumAvatar,
+                        bgcolor: 'secondary.dark',
+                        color: 'secondary.200',
+                        zIndex: 1
+                      }}
+                      aria-controls="menu-earning-card"
+                      aria-haspopup="true"
+                      onClick={handleClick}
+                    >
+                      <MoreHorizIcon fontSize="inherit" />
+                    </Avatar>
+                    <Menu
+                      id="menu-earning-card"
+                      anchorEl={anchorEl}
+                      keepMounted
+                      open={Boolean(anchorEl)}
+                      onClose={handleClose}
+                      variant="selectedMenu"
+                      anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'right'
+                      }}
+                      transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right'
+                      }}
+                    >
+                      <MenuItem onClick={handleClose}>
+                        <GetAppTwoToneIcon sx={{ mr: 1.75 }} /> Görevleri İşle
+                      </MenuItem>
+                    </Menu>
                   </Grid>
                 </Grid>
               </Grid>
               <Grid item>
                 <Grid container alignItems="center">
                   <Grid item>
-                    <Typography sx={{ fontSize: '2.125rem', fontWeight: 500, mr: 1, mt: 1.75, mb: 0.75 }}>{totalDuties}</Typography>
-                  </Grid>
-                  <Grid item>
-                    <Avatar
-                      sx={{
-                        cursor: 'pointer',
-                        ...theme.typography.smallAvatar,
-                        bgcolor: 'secondary.200',
-                        color: 'secondary.dark'
-                      }}
-                    >
-                      <AccountBalanceWalletIcon fontSize="inherit" />
-                    </Avatar>
+                    <Typography sx={{ fontSize: '2.125rem', fontWeight: 500, mr: 1, mt: 1.75, mb: 0.75 }}>{totalDuties} Görev</Typography>
                   </Grid>
                 </Grid>
               </Grid>
@@ -136,8 +160,8 @@ const EarningCard = ({ isLoading, totalDuties, subText }) => {
   );
 };
 
-EarningCard.propTypes = {
+Gorevlendirmeler.propTypes = {
   isLoading: PropTypes.bool
 };
 
-export default EarningCard;
+export default Gorevlendirmeler;

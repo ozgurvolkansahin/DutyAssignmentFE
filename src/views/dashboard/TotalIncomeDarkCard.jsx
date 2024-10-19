@@ -9,7 +9,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-
+import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import TotalIncomeCard from 'ui-component/cards/Skeleton/TotalIncomeCard';
@@ -69,19 +69,19 @@ const TotalIncomeDarkCard = ({ isLoading }) => {
                       color: '#fff'
                     }}
                   >
-                    <TableChartOutlinedIcon fontSize="inherit" />
+                    <ArrowCircleRightIcon fontSize="inherit" />
                   </Avatar>
                 </ListItemAvatar>
                 <ListItemText
                   sx={{ py: 0, my: 0.45 }}
                   primary={
                     <Typography variant="h4" sx={{ color: '#fff' }}>
-                      $203k
+                      Osman TINMAZOL
                     </Typography>
                   }
                   secondary={
                     <Typography variant="subtitle2" sx={{ color: 'primary.light', mt: 0.25 }}>
-                      Total Income
+                      Şube Müdürü
                     </Typography>
                   }
                 />

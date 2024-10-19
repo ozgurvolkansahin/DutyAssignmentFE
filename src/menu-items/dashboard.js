@@ -8,17 +8,25 @@ const icons = { IconDashboard };
 
 const dashboard = {
   id: 'dashboard',
-  title: 'Dashboard',
+  title: 'Anasayfa',
   type: 'group',
   children: [
     {
-      id: 'default',
-      title: 'Dashboard',
+      id: '',
+      title: 'Anasayfa',
       type: 'item',
-      url: '/dashboard/default',
+      url: '/dashboard',
       icon: icons.IconDashboard,
       breadcrumbs: false
-    }
+    },
+    {
+      id: 'assignments',
+      title: 'Atamalar',
+      type: 'item',
+      url: '/assignments',
+      icon: icons.IconDashboard,
+      breadcrumbs: false
+    },
   ]
 };
 
