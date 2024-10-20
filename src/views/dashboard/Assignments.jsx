@@ -1,61 +1,218 @@
-// material-ui
-import Typography from '@mui/material/Typography';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-// project imports
-import MainCard from 'ui-component/cards/MainCard';
+import React, { useState, useEffect } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Button,
+  Modal,
+  Box,
+  Typography,
+  TablePagination,
+  Paper
+} from "@mui/material";
 
-// ==============================|| SAMPLE PAGE ||============================== //
-function createData(name, calories, fat, carbs, protein) {
-  return { name, calories, fat, carbs, protein };
-}
+import { getAssignedPersonalByDutyIdWithPagination, getPaidAssignments } from "services/assignment";
+import { set } from "immutable";
 
-const rows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-  createData('Eclair', 262, 16.0, 24, 6.0),
-  createData('Cupcake', 305, 3.7, 67, 4.3),
-  createData('Gingerbread', 356, 16.0, 49, 3.9),
-];
+const modalStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  height: '85%',
+  width: '75%',
+  overflow: 'scroll',
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+};
 
-const AssignmentsPage = () => (
-  
-  
-<MainCard title="Sample Card">
-<TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell>Dessert (100g serving)</TableCell>
-            <TableCell align="right">Calories</TableCell>
-            <TableCell align="right">Fat&nbsp;(g)</TableCell>
-            <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-            <TableCell align="right">Protein&nbsp;(g)</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((row) => (
-            <TableRow
-              key={row.name}
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
-              <TableCell component="th" scope="row">
-                {row.name}
-              </TableCell>
-              <TableCell align="right">{row.calories}</TableCell>
-              <TableCell align="right">{row.fat}</TableCell>
-              <TableCell align="right">{row.carbs}</TableCell>
-              <TableCell align="right">{row.protein}</TableCell>
+const PersonnelTable = () => {
+  const [open, setOpen] = useState(false);
+  const [personnelData, setPersonnelData] = useState([]);
+  const [selectedDuty, setSelectedDuty] = useState(null);
+  const [dutyData, setDutyData] = useState([]);
+
+  // Ana tablo için pagination
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [dutyCount, setDutyCount] = useState(0);
+
+  // Modal içindeki tablo için pagination
+  const [modalPage, setModalPage] = useState(0);
+  const [modalRowsPerPage, setModalRowsPerPage] = useState(10);
+  const [totalPersonnel, setTotalPersonnel] = useState(0);
+
+  // Personel verisini getirme
+  // sayfa açılırken değil sadece çağrıldığı zaman çalışacak
+  const getPersonnelData = async () => {
+    const response = await getAssignedPersonalByDutyIdWithPagination(
+      selectedDuty.dutyId,
+      modalPage+1,
+      modalRowsPerPage
+    ).then((res) => {
+      return res;
+    });
+    setPersonnelData(response.data.data);
+    setTotalPersonnel(response.data.total);
+    // get total from response and set it for pagination
+    
+  };
+
+  const getPaidAssignmentsCall = async () => {
+    const response = await getPaidAssignments(page+1, rowsPerPage).then((res) => {
+      return res;
+    });
+    setDutyData(response.data.data);
+    setDutyCount(response.data.total);
+  };
+
+  // call getAssignedPersonalByDutyIdWithPagination
+  useEffect(() => {
+    if (open) {
+      getPersonnelData();
+    }
+  }, [modalPage, modalRowsPerPage]);
+  useEffect(() => {
+    getPaidAssignmentsCall();
+  }, []);
+
+  const handleOpen = async (row) => {
+    setSelectedDuty(row);
+  };
+
+  useEffect(() => {
+    if (selectedDuty) {
+      getPersonnelData();
+      setOpen(true); // Modal'ı açmak için
+    }
+  }, [selectedDuty]);
+
+  const handleClose = () => {
+    setSelectedDuty(null);
+    setOpen(false);
+  }
+
+  // Ana tablo için sayfa değişimi
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  // Ana tablo için satır sayısı değişimi
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  // Modal'daki tablo için sayfa değişimi
+  const handleModalChangePage = (event, newPage) => {
+    setModalPage(newPage);
+  };
+
+  // Modal'daki tablo için satır sayısı değişimi
+  const handleModalChangeRowsPerPage = (event) => {
+    setModalRowsPerPage(parseInt(event.target.value, 10));
+    setModalPage(0);
+  };
+
+  return (
+    <div>
+      {/* Ana tablo */}
+      <TableContainer  component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Görev ID</TableCell>
+              <TableCell>Açıklama</TableCell>
+              <TableCell>Tarih</TableCell>
+              <TableCell>Müdür</TableCell>
+              <TableCell>Polis Memuru</TableCell>
+              <TableCell>Ücret Ödenen Personel</TableCell>
+              <TableCell>İşlem</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  </MainCard>
-);
+          </TableHead>
+          <TableBody>
+            {dutyData.map((row) => (
+              <TableRow key={row.Duty.duty_id}>
+                <TableCell>{row.Duty.duty_id}</TableCell>
+                <TableCell>{row.Duty.duty_description}</TableCell>
+                <TableCell>{new Date(row.Duty.date).toLocaleDateString()}</TableCell>
+                <TableCell>{row.ResponsibleManagersCount}</TableCell>
+                <TableCell>{row.PoliceAttendantsCount}</TableCell>
+                <TableCell>{row.PaidPersonalCount}</TableCell>
+                <TableCell>
+                  <Button variant="contained" onClick={() => handleOpen(row)}>
+                    Personeli Göster
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
 
-export default AssignmentsPage;
+        {/* Ana tablo için pagination */}
+        <TablePagination
+          component="div"
+          count={dutyCount}
+          page={page}
+          onPageChange={handleChangePage}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </TableContainer>
+
+      {/* Modal */}
+      <Modal open={open} onClose={handleClose}>
+        <Box sx={modalStyle}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Sicil</TableCell>
+                <TableCell>TC Kimlik</TableCell>
+                <TableCell>İsim</TableCell>
+                <TableCell>Rütbe</TableCell>
+                <TableCell>Birim</TableCell>
+                <TableCell>Noktası</TableCell>
+                <TableCell>Grubu</TableCell>
+                <TableCell>Cep</TableCell>
+                <TableCell>Iban</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {personnelData.length > 0 && personnelData
+                .map((person) => (
+                  <TableRow key={person.sicil}>
+                    <TableCell>{person.sicil}</TableCell>
+                    <TableCell>{person.tcKimlik}</TableCell>
+                    <TableCell>{`${person.ad} ${person.soyad}`}</TableCell>
+                    <TableCell>{person.rutbe}</TableCell>
+                    <TableCell>{person.birim}</TableCell>
+                    <TableCell>{person.nokta}</TableCell>
+                    <TableCell>{person.grup}</TableCell>
+                    <TableCell>{person.tel}</TableCell>
+                    <TableCell>{person.iban}</TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+
+          {/* Modal tablo için pagination */}
+          <TablePagination
+            component="div"
+            count={totalPersonnel}
+            page={modalPage}
+            onPageChange={handleModalChangePage}
+            rowsPerPage={modalRowsPerPage}
+            onRowsPerPageChange={handleModalChangeRowsPerPage}
+          />
+        </Box>
+      </Modal>
+    </div>
+  );
+};
+
+export default PersonnelTable;

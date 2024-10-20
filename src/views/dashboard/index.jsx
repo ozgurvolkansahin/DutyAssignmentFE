@@ -26,7 +26,7 @@ const Dashboard = () => {
   const [isLoading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState({});
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   // if page or rowsPerPage changes, fetch the data again
   useEffect(() => {
