@@ -14,8 +14,7 @@ import {
   Paper
 } from "@mui/material";
 
-import { getAssignedPersonalByDutyIdWithPagination, getPaidAssignments } from "services/assignment";
-import { set } from "immutable";
+import { getAssignedPersonalByDutyIdWithPagination, getPaidAssignments, downloadPersonnelReport } from "services/assignment";
 
 const modalStyle = {
   position: "absolute",
@@ -51,7 +50,7 @@ const PersonnelTable = () => {
   // sayfa açılırken değil sadece çağrıldığı zaman çalışacak
   const getPersonnelData = async () => {
     const response = await getAssignedPersonalByDutyIdWithPagination(
-      selectedDuty.dutyId,
+      selectedDuty.Duty.duty_id,
       modalPage+1,
       modalRowsPerPage
     ).then((res) => {
@@ -67,7 +66,7 @@ const PersonnelTable = () => {
     const response = await getPaidAssignments(page+1, rowsPerPage).then((res) => {
       return res;
     });
-    setDutyData(response.data.data);
+    setDutyData(response.data.data ?? []);
     setDutyCount(response.data.total);
   };
 
@@ -85,6 +84,22 @@ const PersonnelTable = () => {
     setSelectedDuty(row);
   };
 
+  const downloadPersonnelReportExcel = async (dutyId) => {
+    await downloadPersonnelReport(dutyId)  // Yanıtı blob olarak al
+    .then(blob => {
+        // Blob'u bir URL'ye çevir
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        // set filename is dutyId_OdemeListesi.xlsx
+        a.download = `${dutyId}_OdemeListesi.xlsx`;
+        document.body.appendChild(a);
+        a.click();  // Simüle tıklama
+        window.URL.revokeObjectURL(url);  // URL'i serbest bırak
+    })
+    .catch(error => console.error('Download error:', error));  // Hataları yakala
+  };
   useEffect(() => {
     if (selectedDuty) {
       getPersonnelData();
@@ -132,7 +147,6 @@ const PersonnelTable = () => {
               <TableCell>Müdür</TableCell>
               <TableCell>Polis Memuru</TableCell>
               <TableCell>Ücret Ödenen Personel</TableCell>
-              <TableCell>İşlem</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -147,6 +161,11 @@ const PersonnelTable = () => {
                 <TableCell>
                   <Button variant="contained" onClick={() => handleOpen(row)}>
                     Personeli Göster
+                  </Button>
+                </TableCell>
+                <TableCell>
+                  <Button variant="contained" onClick={() => downloadPersonnelReportExcel(row.Duty.duty_id)}>
+                    Rapor İndir
                   </Button>
                 </TableCell>
               </TableRow>

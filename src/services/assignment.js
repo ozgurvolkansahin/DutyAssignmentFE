@@ -21,8 +21,22 @@ export const getPaidAssignments = async (pageNumber, pageSize) => {
     });
     return res;
 }
+
+export const downloadPersonnelReport = async (dutyId) => {
+    const res = await fetcher({
+        url: `/assignment/DownloadPersonalReportForSpecificDuty?dutyId=${dutyId}`,
+        config: {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            responseType: 'blob'
+        }
+    });
+    return res;
+}
+
 export const assignToDuty = async (data) => {
-    const res = await ({
+    const res = await poster({
         url: '/assignment/SelectPersonalToBePaid',
         config: {
             headers: {

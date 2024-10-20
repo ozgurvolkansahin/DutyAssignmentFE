@@ -12,18 +12,24 @@ import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
 import { Modal, Box, TextField, IconButton } from '@mui/material';
 // project imports
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CloseIcon from '@mui/icons-material/Close'; // X iconu için gerekli import
 import ConfirmationModal from './ConfirmationModal';
-import { poster } from 'utils/axios';
-// ==============================|| SAMPLE PAGE ||============================== //
+import { assignToDuty, getAssignedPersonalByDutyIdWithPagination } from 'services/assignment';
+
 
 const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange, totalDuties }) => {
   const [open, setOpen] = useState(false); // Modal açık/kapalı durumu
+  const [personnelModalOpen, setPersonnelModalOpen] = useState(false); // Modal açık/kapalı durumu
+
   const [selectedDuty, setSelectedDuty] = useState(null); // Seçilen personel verisi
   const [assignmentCount, setAssignmentCount] = useState(''); // Input alanındaki değer
   const [confirmOpen, setConfirmOpen] = useState(false); // Onay modalı
-
+  const [personnelData, setPersonnelData] = useState([]);
+  // Modal içindeki tablo için pagination
+  const [modalPage, setModalPage] = useState(0);
+  const [modalRowsPerPage, setModalRowsPerPage] = useState(10);
+  const [totalPersonnel, setTotalPersonnel] = useState(0);
   const dateOptions = {
     year: 'numeric',
     month: '2-digit',
@@ -41,6 +47,20 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
     boxShadow: 24,
     p: 4
   };
+
+  const personnelModalStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    height: '85%',
+    width: '75%',
+    overflow: 'scroll',
+    bgcolor: "background.paper",
+    border: "2px solid #000",
+    boxShadow: 24,
+    p: 4,
+  };
   const handleOpen = (duty) => {
     setSelectedDuty(duty); // Hangi kişiye tıklandığını al
     setOpen(true);
@@ -48,25 +68,45 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
 
   // Modal kapatma
   const handleClose = () => {
-    setSelectedDuty(null);
     setAssignmentCount('');
     setOpen(false);
   };
-
+  const getPersonnelData = async () => {
+    const response = await getAssignedPersonalByDutyIdWithPagination(
+      selectedDuty.dutyId,
+      modalPage+1,
+      modalRowsPerPage
+    ).then((res) => {
+      return res;
+    });
+    setPersonnelData(response.data.data);
+    setTotalPersonnel(response.data.total);
+    setPersonnelModalOpen(true);
+    // get total from response and set it for pagination
+    
+  };
   // Atama yap butonu için fonksiyon
-  const handleAssignment = () => {
+  const handleAssignment = async () => {
     // İlgili işlemleri burada yapabilirsiniz
-    poster({
-        "dutyIds": [selectedDuty.dutyId],
-        "assignmentCount": +assignmentCount
+    const response = await assignToDuty({
+      dutyIds: [selectedDuty.dutyId],
+      assignmentCount: +assignmentCount
+    }).then((res) => {
+      return res;
     });
     handleClose(); // Atama yapıldıktan sonra modal kapatılır
+    getPersonnelData(); // Atama yapıldıktan sonra personel listesini günceller
   };
   // Handle pagination change
   const handleChangePage = (event, newPage) => {
     onPageChange(newPage);
   };
-
+  // call getAssignedPersonalByDutyIdWithPagination
+  useEffect(() => {
+    if (personnelModalOpen) {
+      getPersonnelData();
+    }
+  }, [modalPage, modalRowsPerPage]);
   const handleChangeRowsPerPage = (event) => {
     onRowsPerPageChange(parseInt(event.target.value, 10));
   };
@@ -88,6 +128,24 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
   const handleCancel = () => {
     setConfirmOpen(false); // Onay modalını kapat
   };
+  const handlePersonnelModalClose = () => {
+    setPersonnelData([]); // Personel listesini temizle
+    setSelectedDuty(null);
+    setPersonnelModalOpen(false); // Onay modalını kapat
+    
+  };
+
+    // Modal'daki tablo için sayfa değişimi
+    const handleModalChangePage = (event, newPage) => {
+      setModalPage(newPage);
+    };
+  
+    // Modal'daki tablo için satır sayısı değişimi
+    const handleModalChangeRowsPerPage = (event) => {
+      setModalRowsPerPage(parseInt(event.target.value, 10));
+      setModalPage(0);
+    };
+
   function defaultLabelDisplayedRows({ from, to, count }) {
     return ` ${count !== -1 ? count : `more than ${to}`} görevden ${from}–${to} gösteriliyor`;
   }
@@ -146,7 +204,7 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
           >
             <CloseIcon />
           </IconButton>
-          <h2>{selectedDuty ? selectedDuty.dutyId : ''} için Personel Sayısı</h2>
+          <h2>{selectedDuty ? selectedDuty.dutyId : ''} No'lu Görev Ataması</h2>
           <TextField
             fullWidth
             label="Atanacak Personel Sayısı"
@@ -162,12 +220,54 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
         </Box>
       </Modal>
 
-      <ConfirmationModal
-        open={confirmOpen}
-        onClose={handleCancel}
-        onConfirm={handleConfirm}
-      />
+      <ConfirmationModal open={confirmOpen} onClose={handleCancel} onConfirm={handleConfirm} />
 
+      {/* Atama Listesi Modal */}
+      <Modal open={personnelModalOpen} onClose={handlePersonnelModalClose}>
+        <Box sx={personnelModalStyle}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Sicil</TableCell>
+                <TableCell>TC Kimlik</TableCell>
+                <TableCell>İsim</TableCell>
+                <TableCell>Rütbe</TableCell>
+                <TableCell>Birim</TableCell>
+                <TableCell>Noktası</TableCell>
+                <TableCell>Grubu</TableCell>
+                <TableCell>Cep</TableCell>
+                <TableCell>Iban</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {personnelData.length > 0 &&
+                personnelData.map((person) => (
+                  <TableRow key={person.sicil}>
+                    <TableCell>{person.sicil}</TableCell>
+                    <TableCell>{person.tcKimlik}</TableCell>
+                    <TableCell>{`${person.ad} ${person.soyad}`}</TableCell>
+                    <TableCell>{person.rutbe}</TableCell>
+                    <TableCell>{person.birim}</TableCell>
+                    <TableCell>{person.nokta}</TableCell>
+                    <TableCell>{person.grup}</TableCell>
+                    <TableCell>{person.tel}</TableCell>
+                    <TableCell>{person.iban}</TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+
+          {/* Modal tablo için pagination */}
+          <TablePagination
+            component="div"
+            count={totalPersonnel}
+            page={modalPage}
+            onPageChange={handleModalChangePage}
+            rowsPerPage={modalRowsPerPage}
+            onRowsPerPageChange={handleModalChangeRowsPerPage}
+          />
+        </Box>
+      </Modal>
     </TableContainer>
   );
 };
