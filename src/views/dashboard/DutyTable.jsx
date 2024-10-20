@@ -14,9 +14,10 @@ import { Modal, Box, TextField, IconButton } from '@mui/material';
 // project imports
 import React, { useState, useEffect } from 'react';
 import CloseIcon from '@mui/icons-material/Close'; // X iconu için gerekli import
+import DownloadIcon from '@mui/icons-material/Download'; // İndirme iconu için gerekli import
 import ConfirmationModal from './ConfirmationModal';
 import { assignToDuty, getAssignedPersonalByDutyIdWithPagination } from 'services/assignment';
-
+import { downloadPersonnelReport } from 'services/assignment';
 
 const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange, totalDuties, onDeleteDuty }) => {
   const [open, setOpen] = useState(false); // Modal açık/kapalı durumu
@@ -156,7 +157,22 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
       setModalRowsPerPage(parseInt(event.target.value, 10));
       setModalPage(0);
     };
-
+   const onPersonnelExcelDownload = async () => {
+    await downloadPersonnelReport(selectedDuty.dutyId)  // Yanıtı blob olarak al
+    .then(blob => {
+        // Blob'u bir URL'ye çevir
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        // set filename is dutyId_OdemeListesi.xlsx
+        a.download = `${selectedDuty.dutyId}_OdemeListesi.xlsx`;
+        document.body.appendChild(a);
+        a.click();  // Simüle tıklama
+        window.URL.revokeObjectURL(url);  // URL'i serbest bırak
+    })
+    .catch(error => console.error('Download error:', error));  // Hataları yakala
+   }
   function defaultLabelDisplayedRows({ from, to, count }) {
     return ` ${count !== -1 ? count : `more than ${to}`} görevden ${from}–${to} gösteriliyor`;
   }
@@ -240,6 +256,20 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
       {/* Atama Listesi Modal */}
       <Modal open={personnelModalOpen} onClose={handlePersonnelModalClose}>
         <Box sx={personnelModalStyle}>
+        <IconButton
+            aria-label="close"
+            onClick={handlePersonnelModalClose}
+            sx={{ position: 'absolute', top: '8px', right: '8px' }} // X ikonu sağ üst köşede konumlanır
+          >
+            <CloseIcon />
+          </IconButton>
+          <IconButton
+            aria-label="download"
+            onClick={onPersonnelExcelDownload}
+            sx={{ position: 'absolute', top: '8px', left: '8px' }} // X ikonu sağ üst köşede konumlanır
+          >
+            İndirmek için tıklayın <DownloadIcon />
+          </IconButton>
           <Table>
             <TableHead>
               <TableRow>
