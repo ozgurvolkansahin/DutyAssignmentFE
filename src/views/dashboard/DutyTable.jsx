@@ -18,7 +18,7 @@ import ConfirmationModal from './ConfirmationModal';
 import { assignToDuty, getAssignedPersonalByDutyIdWithPagination } from 'services/assignment';
 
 
-const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange, totalDuties }) => {
+const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange, totalDuties, onDeleteDuty }) => {
   const [open, setOpen] = useState(false); // Modal açık/kapalı durumu
   const [personnelModalOpen, setPersonnelModalOpen] = useState(false); // Modal açık/kapalı durumu
 
@@ -91,11 +91,21 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
     const response = await assignToDuty({
       dutyIds: [selectedDuty.dutyId],
       assignmentCount: +assignmentCount
-    }).then((res) => {
+    })
+    .then((res) => {
       return res;
+    })
+    .then(() => {
+      handleClose(); // Atama yapıldıktan sonra modal kapatılır
+      getPersonnelData(); // Atama yapıldıktan sonra personel listesini günceller
+    })
+    .catch((err) => {
+      if (err.data === "TOO_MANY_PEOPLE_TO_SELECT") {
+        alert("Atanacak personel sayısı, atanacak personel sayısından fazla olamaz.");
+      } else {
+        alert("Bir hata oluştu. Lütfen tekrar deneyin.");
+      }
     });
-    handleClose(); // Atama yapıldıktan sonra modal kapatılır
-    getPersonnelData(); // Atama yapıldıktan sonra personel listesini günceller
   };
   // Handle pagination change
   const handleChangePage = (event, newPage) => {
@@ -130,6 +140,7 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
   };
   const handlePersonnelModalClose = () => {
     setPersonnelData([]); // Personel listesini temizle
+    onDeleteDuty(selectedDuty.dutyId); // Atama yapılan görevi ana listeden sil
     setSelectedDuty(null);
     setPersonnelModalOpen(false); // Onay modalını kapat
     
@@ -161,6 +172,8 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
           <TableRow>
             <TableCell>Görev Numarası</TableCell>
             <TableCell>Görev Açıklaması</TableCell>
+            <TableCell>Görevli Müdür</TableCell>
+            <TableCell>Görevli Personel</TableCell>
             <TableCell>Görev Tarihi</TableCell>
             <TableCell>Atama Yap</TableCell>
           </TableRow>
@@ -170,6 +183,8 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
             <TableRow key={index}>
               <TableCell>{row.dutyId}</TableCell>
               <TableCell>{row.duty.description}</TableCell>
+              <TableCell>{row.responsibleManagersCount}</TableCell>
+              <TableCell>{row.policeAttendantsCount}</TableCell>
               <TableCell>{new Date(row.duty.date).toLocaleString('tr-tr', dateOptions)}</TableCell>
               <TableCell>
                 {/* Buton ekleniyor, tıklama ile onButtonClick fonksiyonu çağrılıyor */}

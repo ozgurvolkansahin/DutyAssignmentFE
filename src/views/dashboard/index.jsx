@@ -37,15 +37,7 @@ const Dashboard = () => {
     };
     fetchData();
   }, [page, rowsPerPage]);
-  // // fetch data on page load
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const response = await getDashboard(page, rowsPerPage);
-  //     setDashboardData(response);
-  //     setLoading(false);
-  //   };
-  //   fetchData();
-  // }, []);
+
 
   // Sayfa değişikliğini yönetir
   const handlePageChange = (newPage) => {
@@ -57,6 +49,11 @@ const Dashboard = () => {
     setRowsPerPage(newRowsPerPage);
     setPage(1); // Satır sayısı değiştiğinde ilk sayfaya dön
   };
+  const deleteDuty = (data) => {
+    // remove duty from the list
+    const updatedData = dashboardData.data.filter((duty) => duty.duty_id !== data.duty_id);
+  };
+
   // if isLoading is true then show the skeleton loader
   // else return the dashboard data
   return isLoading ? (
@@ -106,6 +103,7 @@ const Dashboard = () => {
               totalDuties={dashboardData.totalDuties}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleRowsPerPageChange}
+              onDeleteDuty={() => deleteDuty}
             />
           </Grid>
           {/* <Grid item xs={12} md={3}>
