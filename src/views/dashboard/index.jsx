@@ -51,7 +51,9 @@ const Dashboard = () => {
   };
   const deleteDuty = (data) => {
     // remove duty from the list
-    const updatedData = dashboardData.data.filter((duty) => duty.duty_id !== data.duty_id);
+    const updatedData = dashboardData.assignmentLookupDuty.filter((duty) => duty.dutyId !== data);
+    setDashboardData({ ...dashboardData, assignmentLookupDuty: updatedData, waitingAssignmentsCount: dashboardData.waitingAssignmentsCount - 1 });
+
   };
 
   // if isLoading is true then show the skeleton loader
@@ -100,10 +102,10 @@ const Dashboard = () => {
               data={dashboardData}
               page={page}
               rowsPerPage={rowsPerPage}
-              totalDuties={dashboardData.totalDuties}
+              totalDuties={dashboardData.waitingAssignmentsCount}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleRowsPerPageChange}
-              onDeleteDuty={() => deleteDuty}
+              onDeleteDuty={deleteDuty}
             />
           </Grid>
           {/* <Grid item xs={12} md={3}>
