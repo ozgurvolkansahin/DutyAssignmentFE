@@ -17,8 +17,9 @@ import {
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { getPersonnel, getPersonnelDuties } from 'services/personnel';
 import { debounce } from 'lodash';
-import { Person } from '@mui/icons-material';
+import { filterPersonnel
 
+ } from 'services/personnel';
 const modalStyle = {
   position: 'absolute',
   top: '50%',
@@ -76,18 +77,30 @@ const PersonnelTable = () => {
     }
   }, [modalPage, modalRowsPerPage]);
 
+  useEffect(() => {
+    // Kullanıcının yazmayı bitirmesini beklemek için debounce kullanıyoruz
+    const delayedFetch = debounce(() => {
+      fetchFilteredPersonnel();
+    }, 1500);
+    
+    delayedFetch();
+  
+    // Clean up function, debounce işlemini iptal etmek için
+    return () => clearTimeout(delayedFetch);
+  }, [filters]);  // Filters state'i izleniyor
+
   // Arama alanı değişikliklerini yakalayacak fonksiyon
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters({ ...filters, [name]: value });
-
-    // wait for user to stop typing then call fetchFilteredPersonnel();
-    debounce(fetchFilteredPersonnel, 1500)();
   };
 
   // Filtrelenmiş personel listesini getiren servis çağrısı (örnek)
   const fetchFilteredPersonnel = () => {
-    console.log('Filters: ', filters);
+    filterPersonnel(filters, page+1, rowsPerPage).then((response) => {
+      setPersonnelData(response.data);
+      setTotalPersonnel(response.total);
+    });
   };
   // Ana tablo için sayfa değişimi
   const handleChangePage = (event, newPage) => {
@@ -96,6 +109,17 @@ const PersonnelTable = () => {
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
+    setFilters({
+      sicil: '',
+      tcKimlik: '',
+      isim: '',
+      rutbe: '',
+      birim: '',
+      nokta: '',
+      grup: '',
+      tel: '',
+      iban: ''
+    })
   };
   const getPersonnelData = () => {
     getPersonnel(page + 1, rowsPerPage).then((response) => {
@@ -163,8 +187,8 @@ const PersonnelTable = () => {
             <TableCell>
               <Input placeholder="IBAN" name="iban" value={filters.iban} onChange={handleFilterChange} />
             </TableCell>
-            <TableCell>Görevler </TableCell>
-            <TableCell>Ödemeler </TableCell>
+            <TableCell>Görevler</TableCell>
+            <TableCell>Ödemeler</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

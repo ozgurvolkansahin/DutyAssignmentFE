@@ -27,3 +27,16 @@ export const getPersonnelDuties = async (sicil, pageNumber, pageSize, isPaidDuti
     });
     return res.data;
 }
+
+export const filterPersonnel = async (filters, page, pageSize) => {
+    const res = await poster({
+        url: `/personnel/filter`,
+        config: {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        },
+        data: {...filters, page, pageSize}
+    });
+    return res.data;
+}
