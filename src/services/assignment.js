@@ -76,3 +76,15 @@ export const getFilteredAssignments = async (filters, page, pageSize) => {
     });
     return res.data;
 }
+
+export const resetAssignment = async (dutyId) => {
+    const res = await fetcher({
+        url: `/assignment/ResetAssignment?dutyId=${dutyId}`,
+        config: {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }
+    });
+    return res;
+}

@@ -140,11 +140,12 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
     setConfirmOpen(false); // Onay modalını kapat
   };
   const handlePersonnelModalClose = () => {
-    setPersonnelData([]); // Personel listesini temizle
-    onDeleteDuty(selectedDuty.dutyId); // Atama yapılan görevi ana listeden sil
-    setSelectedDuty(null);
-    setPersonnelModalOpen(false); // Onay modalını kapat
+    // setPersonnelData([]); // Personel listesini temizle
+    // onDeleteDuty(selectedDuty.dutyId); // Atama yapılan görevi ana listeden sil
+    // setSelectedDuty(null);
+    // setPersonnelModalOpen(false); // Onay modalını kapat
     
+    window.location.reload();
   };
 
     // Modal'daki tablo için sayfa değişimi

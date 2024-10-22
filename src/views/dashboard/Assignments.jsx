@@ -14,8 +14,7 @@ import {
   Input
 } from "@mui/material";
 
-import { getAssignedPersonalByDutyIdWithPagination, getPaidAssignments, downloadPersonnelReport } from "services/assignment";
-import { getFilteredAssignments } from "services/assignment";
+import { getAssignedPersonalByDutyIdWithPagination, getPaidAssignments, downloadPersonnelReport, getFilteredAssignments, resetAssignment } from "services/assignment";
 import { debounce } from 'lodash';
 
 const modalStyle = {
@@ -68,6 +67,19 @@ const PersonnelTable = () => {
     setTotalPersonnel(response.data.total);
     // get total from response and set it for pagination
     
+  };
+
+  const resetPaidAssignment = async (dutyId) => {
+    await resetAssignment(dutyId).then((res) => {
+      if (res.status === 200) {
+        alert('Atama başarıyla silindi');
+        var dutyDataCopy = [...dutyData];
+        dutyDataCopy = dutyDataCopy.filter((duty) => duty.Duty.duty_id !== dutyId);
+        setDutyData(dutyDataCopy);
+      } else {
+        alert('Atama silinirken bir hata oluştu');
+      }
+    });
   };
 
   const getPaidAssignmentsCall = async () => {
@@ -218,6 +230,11 @@ const PersonnelTable = () => {
                 <TableCell>
                   <Button variant="contained" onClick={() => downloadPersonnelReportExcel(row.Duty.duty_id)}>
                     Rapor İndir
+                  </Button>
+                </TableCell>
+                <TableCell>
+                  <Button variant="contained" onClick={() => resetPaidAssignment(row.Duty.duty_id)}>
+                    Atamayı Sil
                   </Button>
                 </TableCell>
               </TableRow>
