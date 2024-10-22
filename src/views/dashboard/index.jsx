@@ -72,7 +72,7 @@ const Dashboard = () => {
             <TotalOrderLineChartCard isLoading={isLoading} totalAssignments={dashboardData.totalAssignments} />
           </Grid>
           <Grid item lg={3} md={6} sm={4} xs={12}>
-            <EarningCard isLoading={isLoading} totalDuties={dashboardData.totalPayments} subText={'Ödeme Yapılan Personel'} />
+            <EarningCard isLoading={isLoading} totalDuties={dashboardData.totalPaymentsDone} subText={`${dashboardData.totalPayments} Ödeme Yapılan Personel`} />
           </Grid>
           <Grid item lg={3} md={12} sm={12} xs={12}>
             <Grid container spacing={gridSpacing}>
