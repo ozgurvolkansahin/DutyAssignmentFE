@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   Table,
   TableBody,
@@ -40,6 +40,7 @@ const PersonnelTable = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalPersonnel, setTotalPersonnel] = useState(0);
+  const isFirstRender = useRef(true);
 
   // personnel duties data for modal
   const [dutiesData, setDutiesData] = useState([]);
@@ -78,15 +79,22 @@ const PersonnelTable = () => {
   }, [modalPage, modalRowsPerPage]);
 
   useEffect(() => {
-    // Kullanıcının yazmayı bitirmesini beklemek için debounce kullanıyoruz
-    const delayedFetch = debounce(() => {
-      fetchFilteredPersonnel();
-    }, 1500);
-    
-    delayedFetch();
-  
-    // Clean up function, debounce işlemini iptal etmek için
-    return () => clearTimeout(delayedFetch);
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    // if filters are empyt, do nothing
+    if (Object.values(filters).every((filter) => filter === '')) {
+      getPersonnelData();
+      return;
+    }
+    // wait for 1500 ms then fetch filtered personnel
+    const debouncedFetchFilteredPersonnel = debounce(fetchFilteredPersonnel, 1500);
+    debouncedFetchFilteredPersonnel();
+    // Cleanup function to cancel the debounce if filters change before the delay
+    return () => {
+      debouncedFetchFilteredPersonnel.cancel();
+  };
   }, [filters]);  // Filters state'i izleniyor
 
   // Arama alanı değişikliklerini yakalayacak fonksiyon
@@ -158,6 +166,21 @@ const PersonnelTable = () => {
   return (
     <TableContainer component={Paper}>
       <Table>
+      <TableHead>
+          <TableRow>
+            <TableCell>Sicil</TableCell>
+            <TableCell>TC Kimlik</TableCell>
+            <TableCell>İsim</TableCell>
+            <TableCell>Rütbe</TableCell>
+            <TableCell>Birim</TableCell>
+            <TableCell>Nokta</TableCell>
+            <TableCell>Grup</TableCell>
+            <TableCell>Cep</TableCell>
+            <TableCell>IBAN</TableCell>
+            <TableCell>Görev Sayısı</TableCell>
+            <TableCell>Ödenen Görev Sayısı</TableCell>
+          </TableRow>
+        </TableHead>
         <TableHead>
           <TableRow>
             <TableCell>

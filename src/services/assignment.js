@@ -62,3 +62,17 @@ export const getAssignedPersonalByDutyIdWithPagination = async (dutyId,page,page
     }});
     return res;
 }
+
+
+export const getFilteredAssignments = async (filters, page, pageSize) => {
+    const res = await poster({
+        url: '/assignment/Filter',
+        config: {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        },
+        data: {...filters, page, pageSize}
+    });
+    return res.data;
+}

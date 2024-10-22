@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Table,
   TableBody,
@@ -9,12 +9,14 @@ import {
   Button,
   Modal,
   Box,
-  Typography,
   TablePagination,
-  Paper
+  Paper,
+  Input
 } from "@mui/material";
 
 import { getAssignedPersonalByDutyIdWithPagination, getPaidAssignments, downloadPersonnelReport } from "services/assignment";
+import { getFilteredAssignments } from "services/assignment";
+import { debounce } from 'lodash';
 
 const modalStyle = {
   position: "absolute",
@@ -31,10 +33,16 @@ const modalStyle = {
 };
 
 const PersonnelTable = () => {
+  const [filters, setFilters] = useState({
+    dutyId: '',
+    dutyDescription: '',
+  });
+
   const [open, setOpen] = useState(false);
   const [personnelData, setPersonnelData] = useState([]);
   const [selectedDuty, setSelectedDuty] = useState(null);
   const [dutyData, setDutyData] = useState([]);
+  const isFirstRender = useRef(true);
 
   // Ana tablo için pagination
   const [page, setPage] = useState(0);
@@ -82,6 +90,34 @@ const PersonnelTable = () => {
 
   const handleOpen = async (row) => {
     setSelectedDuty(row);
+  };
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    // if filters are empyt, do nothing
+    if (Object.values(filters).every((filter) => filter === '')) {
+      getPaidAssignmentsCall();
+      return;
+    }
+
+    // wait for 1500 ms then fetch filtered personnel
+    const debouncedFetchFilteredAssignments = debounce(getFilteredAssignmentsApi, 1500);
+    debouncedFetchFilteredAssignments();
+    // Cleanup function to cancel the debounce if filters change before the delay
+    return () => {
+      debouncedFetchFilteredAssignments.cancel();
+  };
+  }, [filters]);  // Filters state'i izleniyor
+
+  const getFilteredAssignmentsApi = async () => {
+    const response = await getFilteredAssignments(filters, page+1, rowsPerPage).then((res) => {
+      return res;
+    });
+    setDutyData(response.data ?? []);
+    setDutyCount(response.total);
   };
 
   const downloadPersonnelReportExcel = async (dutyId) => {
@@ -134,6 +170,10 @@ const PersonnelTable = () => {
     setModalPage(0);
   };
 
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters({ ...filters, [name]: value });
+  };
   return (
     <div>
       {/* Ana tablo */}
@@ -141,7 +181,7 @@ const PersonnelTable = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Görev ID</TableCell>
+              <TableCell>Görev Numarası</TableCell>
               <TableCell>Açıklama</TableCell>
               <TableCell>Tarih</TableCell>
               <TableCell>Müdür</TableCell>
@@ -151,6 +191,16 @@ const PersonnelTable = () => {
               <TableCell></TableCell>
             </TableRow>
           </TableHead>
+          <TableHead>
+          <TableRow>
+            <TableCell>
+              <Input placeholder="Görev Numarası" name="dutyId" value={filters.duty_id} onChange={handleFilterChange} />
+            </TableCell>
+            <TableCell>
+              <Input placeholder="Açıklama" name="dutyDescription" value={filters.duty_description} onChange={handleFilterChange} />
+            </TableCell>
+          </TableRow>
+        </TableHead>
           <TableBody>
             {dutyData.map((row) => (
               <TableRow key={row.Duty.duty_id}>
