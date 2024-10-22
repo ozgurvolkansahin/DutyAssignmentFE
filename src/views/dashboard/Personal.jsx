@@ -161,7 +161,9 @@ const PersonnelTable = () => {
     setModalPage(0);
     setModalRowsPerPage(4);
   }
-
+  function defaultLabelDisplayedRows({ from, to, count }) {
+    return ` ${count !== -1 ? count : `more than ${to}`} görevden ${from}–${to} gösteriliyor`;
+  }
 
   return (
     <TableContainer component={Paper}>
@@ -264,6 +266,9 @@ const PersonnelTable = () => {
         rowsPerPage={rowsPerPage}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
+        labelRowsPerPage="Sayfa Başına Veri Sayısı"
+        labelDisplayedRows={defaultLabelDisplayedRows}
+
       />
 
       {/* Modal */}
@@ -302,6 +307,8 @@ const PersonnelTable = () => {
             rowsPerPage={modalRowsPerPage}
             onPageChange={(event, newPage) => setModalPage(newPage)}
             onRowsPerPageChange={(event) => setModalRowsPerPage(parseInt(event.target.value, 10))}
+            labelRowsPerPage="Sayfa Başına Veri Sayısı"
+            labelDisplayedRows={defaultLabelDisplayedRows}
           />
         </Box>
       </Modal>

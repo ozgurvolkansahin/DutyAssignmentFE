@@ -72,12 +72,12 @@ const PersonnelTable = () => {
   const resetPaidAssignment = async (dutyId) => {
     await resetAssignment(dutyId).then((res) => {
       if (res.status === 200) {
-        alert('Atama başarıyla silindi');
+        alert('Ödeme başarıyla silindi');
         var dutyDataCopy = [...dutyData];
         dutyDataCopy = dutyDataCopy.filter((duty) => duty.Duty.duty_id !== dutyId);
         setDutyData(dutyDataCopy);
       } else {
-        alert('Atama silinirken bir hata oluştu');
+        alert('Ödeme silinirken bir hata oluştu');
       }
     });
   };
@@ -186,6 +186,9 @@ const PersonnelTable = () => {
     const { name, value } = e.target;
     setFilters({ ...filters, [name]: value });
   };
+  function defaultLabelDisplayedRows({ from, to, count }) {
+    return ` ${count !== -1 ? count : `more than ${to}`} görevden ${from}–${to} gösteriliyor`;
+  }
   return (
     <div>
       {/* Ana tablo */}
@@ -197,7 +200,7 @@ const PersonnelTable = () => {
               <TableCell>Açıklama</TableCell>
               <TableCell>Tarih</TableCell>
               <TableCell>Sorumlu Personel</TableCell>
-              <TableCell>Polis Memuru</TableCell>
+              <TableCell>Görevli Personel</TableCell>
               <TableCell>Ücret Ödenen Personel</TableCell>
               <TableCell></TableCell>
               <TableCell></TableCell>
@@ -234,7 +237,7 @@ const PersonnelTable = () => {
                 </TableCell>
                 <TableCell>
                   <Button variant="contained" onClick={() => resetPaidAssignment(row.Duty.duty_id)}>
-                    Atamayı Sil
+                    Ödemeyi Sil
                   </Button>
                 </TableCell>
               </TableRow>
@@ -250,6 +253,9 @@ const PersonnelTable = () => {
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}
           onRowsPerPageChange={handleChangeRowsPerPage}
+          labelRowsPerPage="Sayfa Başına Veri Sayısı"
+          labelDisplayedRows={defaultLabelDisplayedRows}
+
         />
       </TableContainer>
 
@@ -296,6 +302,8 @@ const PersonnelTable = () => {
             onPageChange={handleModalChangePage}
             rowsPerPage={modalRowsPerPage}
             onRowsPerPageChange={handleModalChangeRowsPerPage}
+            labelRowsPerPage="Sayfa Başına Veri Sayısı"
+            labelDisplayedRows={defaultLabelDisplayedRows}
           />
         </Box>
       </Modal>

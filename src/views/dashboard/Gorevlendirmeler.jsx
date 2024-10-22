@@ -20,6 +20,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import GetAppTwoToneIcon from '@mui/icons-material/GetAppOutlined';
 import { insertDuties } from 'services/duty';
+import { Button } from '@mui/material';
 
 // ===========================|| DASHBOARD DEFAULT - EARNING CARD ||=========================== //
 
@@ -33,13 +34,22 @@ const Gorevlendirmeler = ({ isLoading, totalDuties, subText }) => {
   };
 
   const handleClose = () => {
+    setAnchorEl(false);
+  };
+  const processDuties = () => {
     // call insertDuties function
     insertDuties().then((response) => {
-      console.log(response);
-    // reload page
-    window.location.reload();
-    });
+      if (response.status === 200) {
+        // reload page
+        alert('Görevler başarıyla işlendi.');
+        window.location.reload();
+      }
+    }).catch((error) => {
+      console.error(error);
+      alert('Görevler işlenirken bir hata oluştu.');
+      setAnchorEl(false);
 
+    });
   };
 
   return (
@@ -127,8 +137,10 @@ const Gorevlendirmeler = ({ isLoading, totalDuties, subText }) => {
                         horizontal: 'right'
                       }}
                     >
-                      <MenuItem onClick={handleClose}>
-                        <GetAppTwoToneIcon sx={{ mr: 1.75 }} /> Görevleri İşle
+                      <MenuItem>
+                        <Button onClick={processDuties} >
+                          <GetAppTwoToneIcon sx={{ mr: 1.75 }} /> Görevleri İşle
+                        </Button>
                       </MenuItem>
                     </Menu>
                   </Grid>
