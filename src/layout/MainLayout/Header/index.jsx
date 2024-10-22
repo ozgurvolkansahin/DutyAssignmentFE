@@ -67,7 +67,7 @@ const Header = ({ handleLeftDrawerToggle }) => {
             ml: 4,
           }}
         >
-          Spor Polisi Şube Müdürlüğü Görev Ödemelerini Atama Sistemi
+          Spor Güvenliği Şube Müdürlüğü Görev Ödemeleri Sistemi
         </Typography>
       </Box>
 

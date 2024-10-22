@@ -181,7 +181,7 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
     <TableContainer component={Paper}>
       <Toolbar>
         <Typography variant="h3" component="div">
-          Atama Yapılacak Görevler
+          Ödeme Yapılacak Görevler
         </Typography>
       </Toolbar>
       <Table>
@@ -189,7 +189,7 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
           <TableRow>
             <TableCell>Görev Numarası</TableCell>
             <TableCell>Görev Açıklaması</TableCell>
-            <TableCell>Görevli Müdür</TableCell>
+            <TableCell>Sorumlu Personel</TableCell>
             <TableCell>Görevli Personel</TableCell>
             <TableCell>Görev Tarihi</TableCell>
             <TableCell>Atama Yap</TableCell>

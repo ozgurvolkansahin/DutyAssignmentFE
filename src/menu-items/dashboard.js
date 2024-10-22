@@ -21,7 +21,7 @@ const dashboard = {
     },
     {
       id: 'assignments',
-      title: 'Atamalar',
+      title: 'Ödemeler',
       type: 'item',
       url: '/assignments',
       icon: icons.IconDashboard,

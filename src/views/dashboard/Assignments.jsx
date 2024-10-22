@@ -196,7 +196,7 @@ const PersonnelTable = () => {
               <TableCell>Görev Numarası</TableCell>
               <TableCell>Açıklama</TableCell>
               <TableCell>Tarih</TableCell>
-              <TableCell>Müdür</TableCell>
+              <TableCell>Sorumlu Personel</TableCell>
               <TableCell>Polis Memuru</TableCell>
               <TableCell>Ücret Ödenen Personel</TableCell>
               <TableCell></TableCell>

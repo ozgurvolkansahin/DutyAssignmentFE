@@ -24,7 +24,7 @@ const Logo = () => {
         mt: 0.5
       }}
     >
-      Spor Polisi
+      Spor Şube
     </Typography></>
 
     /**
