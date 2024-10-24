@@ -41,7 +41,7 @@ const Gorevlendirmeler = ({ isLoading, totalDuties, subText }) => {
     insertDuties().then((response) => {
       if (response.status === 200) {
         // reload page
-        alert('Görevler başarıyla işlendi.');
+        alert('Görevler başarıyla işlendi. Ekran yeniden yüklenecek.');
         window.location.reload();
       }
     }).catch((error) => {

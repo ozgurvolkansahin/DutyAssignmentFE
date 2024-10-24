@@ -10,3 +10,15 @@ export const insertDuties = async () => {
     });
     return res;
 }
+
+export const deleteDuty = async (dutyId) => {
+    const res = await fetcher({
+        url: `/duty/Delete?dutyId=${dutyId}`,
+        config: {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }
+    });
+    return res;
+}

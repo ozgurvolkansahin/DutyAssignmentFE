@@ -18,6 +18,9 @@ import DownloadIcon from '@mui/icons-material/Download'; // İndirme iconu için
 import ConfirmationModal from './ConfirmationModal';
 import { assignToDuty, getAssignedPersonalByDutyIdWithPagination } from 'services/assignment';
 import { downloadPersonnelReport } from 'services/assignment';
+import DeleteConfirmationModal from './DeleteConfirmationModal';
+import { deleteDuty } from 'services/duty';
+import { set } from 'immutable';
 
 const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange, totalDuties, onDeleteDuty }) => {
   const [open, setOpen] = useState(false); // Modal açık/kapalı durumu
@@ -26,6 +29,7 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
   const [selectedDuty, setSelectedDuty] = useState(null); // Seçilen personel verisi
   const [assignmentCount, setAssignmentCount] = useState(''); // Input alanındaki değer
   const [confirmOpen, setConfirmOpen] = useState(false); // Onay modalı
+  const [deleteOpen, setDeleteOpen] = useState(false); // Onay modalı
   const [personnelData, setPersonnelData] = useState([]);
   // Modal içindeki tablo için pagination
   const [modalPage, setModalPage] = useState(0);
@@ -67,11 +71,35 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
     setOpen(true);
   };
 
+  const handleDelete = async () => {
+    // İlgili işlemleri burada yapabilirsiniz
+    const response = await deleteDuty(selectedDuty.dutyId)
+    .then((res) => {
+      return res;
+    })
+    .then(() => {
+      alert("Görev başarıyla silindi. Ekran yeniden yüklenecek.");
+      handleDeleteClose(); // Atama yapıldıktan sonra modal kapatılır
+    })
+    .catch((err) => {
+      if (err.data === "ASSIGNMENT_EXISTS") {
+        alert("Bu göreve bir atama yapıldığı için görev silinemez.");
+      } else {
+        alert("Bir hata oluştu. Lütfen tekrar deneyin.");
+      }
+    });
+  };
   // Modal kapatma
   const handleClose = () => {
     setAssignmentCount('');
+    setSelectedDuty(null);
     setOpen(false);
   };
+
+  const handleDeleteClose = () => {
+    window.location.reload();
+  };
+  
   const getPersonnelData = async () => {
     const response = await getAssignedPersonalByDutyIdWithPagination(
       selectedDuty.dutyId,
@@ -136,6 +164,15 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
     setConfirmOpen(false); // Onay modalını kapat
   };
 
+  const handleDeleteOpen = (duty) => {
+    setSelectedDuty(duty); // Hangi kişiye tıklandığını al
+    setDeleteOpen(true);
+  };
+  const handleDeleteCancel = (duty) => {
+    setSelectedDuty(null); // Hangi kişiye tıklandığını al
+    setDeleteOpen(false);
+  };
+  
   const handleCancel = () => {
     setConfirmOpen(false); // Onay modalını kapat
   };
@@ -193,6 +230,7 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
             <TableCell>Görevli Personel</TableCell>
             <TableCell>Görev Tarihi</TableCell>
             <TableCell>Atama Yap</TableCell>
+            <TableCell>Görevi Sil</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -211,6 +249,16 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
                   onClick={() => handleOpen(row)} // Her satırın verisi parametre olarak iletilir
                 >
                   Atama Yap
+                </Button>
+              </TableCell>
+              <TableCell>
+                {/* Buton ekleniyor, tıklama ile onButtonClick fonksiyonu çağrılıyor */}
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => handleDeleteOpen(row)} // Her satırın verisi parametre olarak iletilir
+                >
+                  Görevi Sil
                 </Button>
               </TableCell>
             </TableRow>
@@ -253,6 +301,7 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
       </Modal>
 
       <ConfirmationModal open={confirmOpen} onClose={handleCancel} onConfirm={handleConfirm} />
+      <DeleteConfirmationModal open={deleteOpen} onClose={handleDeleteCancel} onConfirm={handleDelete} />
 
       {/* Atama Listesi Modal */}
       <Modal open={personnelModalOpen} onClose={handlePersonnelModalClose}>
