@@ -17,9 +17,9 @@ import SkeletonEarningCard from 'ui-component/cards/Skeleton/EarningCard';
 // assets
 import EarningIcon from 'assets/images/icons/earning.svg';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import GetAppTwoToneIcon from '@mui/icons-material/GetAppOutlined';
 import { insertDuties } from 'services/duty';
+import { insertPayments } from 'services/assignment';
 import { Button } from '@mui/material';
 
 // ===========================|| DASHBOARD DEFAULT - EARNING CARD ||=========================== //
@@ -36,9 +36,9 @@ const Gorevlendirmeler = ({ isLoading, totalDuties, subText }) => {
   const handleClose = () => {
     setAnchorEl(false);
   };
-  const processDuties = () => {
+  const processDuties = (type) => {
     // call insertDuties function
-    insertDuties().then((response) => {
+    insertDuties(type).then((response) => {
       if (response.status === 200) {
         // reload page
         alert('Görevler başarıyla işlendi. Ekran yeniden yüklenecek.');
@@ -47,6 +47,21 @@ const Gorevlendirmeler = ({ isLoading, totalDuties, subText }) => {
     }).catch((error) => {
       console.error(error);
       alert('Görevler işlenirken bir hata oluştu.');
+      setAnchorEl(false);
+
+    });
+  };
+  const processPayments = () => {
+    // call insertDuties function
+    insertPayments().then((response) => {
+      if (response.status === 200) {
+        // reload page
+        alert('Ödemeler başarıyla işlendi. Ekran yeniden yüklenecek.');
+        window.location.reload();
+      }
+    }).catch((error) => {
+      console.error(error);
+      alert('Ödemeler işlenirken bir hata oluştu.');
       setAnchorEl(false);
 
     });
@@ -138,8 +153,24 @@ const Gorevlendirmeler = ({ isLoading, totalDuties, subText }) => {
                       }}
                     >
                       <MenuItem>
-                        <Button onClick={processDuties} >
-                          <GetAppTwoToneIcon sx={{ mr: 1.75 }} /> Görevleri İşle
+                        <Button onClick={() => processDuties(1)} >
+                          <GetAppTwoToneIcon sx={{ mr: 1.75 }} /> Kadro Görevlerini İşle
+                        </Button>
+                      </MenuItem>
+                      <MenuItem>
+                      <Button onClick={() => processDuties(2)} >
+                          <GetAppTwoToneIcon sx={{ mr: 1.75 }} /> Şube Görevlerini İşle
+                        </Button>
+
+                      </MenuItem>
+                      <MenuItem>
+                      <Button onClick={() => processDuties(3)} >
+                          <GetAppTwoToneIcon sx={{ mr: 1.75 }} /> Çevik Görevlerini İşle
+                        </Button>
+                      </MenuItem>
+                      <MenuItem>
+                        <Button onClick={processPayments} >
+                          <GetAppTwoToneIcon sx={{ mr: 1.75 }} /> Ödemeleri İşle
                         </Button>
                       </MenuItem>
                     </Menu>

@@ -47,11 +47,21 @@ const MainRoutes = {
       ]
     },
     {
-      path: 'personal',
+      path: 'kadro',
       children: [
         {
           path: '',
-          element: <PersonalPageDefault />
+          element: <PersonalPageDefault key={1} type={1} />,
+          
+        }
+      ]
+    },
+    {
+      path: 'cevik-sube',
+      children: [
+        {
+          path: '',
+          element: <PersonalPageDefault key={3} type={3} />
         }
       ]
     },

@@ -88,3 +88,15 @@ export const resetAssignment = async (dutyId) => {
     });
     return res;
 }
+
+export const insertPayments = async () => {
+    const res = await fetcher({
+        url: '/assignment/ProcessPaidDuties',
+        config: {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }
+    });
+    return res;
+}

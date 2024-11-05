@@ -1,7 +1,7 @@
 import { fetcher, poster } from '../utils/axios';
-export const getPersonnel = async (pageNumber, pageSize) => {
+export const getPersonnel = async (pageNumber, pageSize, type) => {
     const res = await fetcher({
-        url: `/personnel?pageNumber=${pageNumber}&pageSize=${pageSize}`,
+        url: `/personnel?pageNumber=${pageNumber}&pageSize=${pageSize}&type=${type}`,
         config: {
             headers: {
                 'Content-Type': 'application/json'

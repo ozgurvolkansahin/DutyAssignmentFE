@@ -98,7 +98,7 @@ const PersonnelTable = () => {
   }, [modalPage, modalRowsPerPage]);
   useEffect(() => {
     getPaidAssignmentsCall();
-  }, []);
+  }, [page, rowsPerPage]);
 
   const handleOpen = async (row) => {
     setSelectedDuty(row);

@@ -28,10 +28,18 @@ const dashboard = {
       breadcrumbs: false
     },
     {
-      id: 'personal',
-      title: 'Personel',
+      id: 'kadro',
+      title: 'Kadro Personel',
       type: 'item',
-      url: '/personal',
+      url: '/kadro',
+      icon: icons.IconDashboard,
+      breadcrumbs: false
+    },
+    {
+      id: 'cevik-sube',
+      title: 'Çevik Şube Personel',
+      type: 'item',
+      url: '/cevik-sube',
       icon: icons.IconDashboard,
       breadcrumbs: false
     },

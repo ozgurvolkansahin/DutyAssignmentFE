@@ -35,13 +35,12 @@ const modalStyle = {
   p: 4
 };
 
-const PersonnelTable = () => {
+const PersonnelTable = ({type}) => {
   // add paginator states
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalPersonnel, setTotalPersonnel] = useState(0);
   const isFirstRender = useRef(true);
-
   // personnel duties data for modal
   const [dutiesData, setDutiesData] = useState([]);
   const [selectedPersonnel, setSelectedPersonnel] = useState(null);
@@ -95,7 +94,7 @@ const PersonnelTable = () => {
     return () => {
       debouncedFetchFilteredPersonnel.cancel();
   };
-  }, [filters]);  // Filters state'i izleniyor
+  }, [filters, type]);  // Filters state'i izleniyor
 
   // Arama alanı değişikliklerini yakalayacak fonksiyon
   const handleFilterChange = (e) => {
@@ -130,7 +129,7 @@ const PersonnelTable = () => {
     })
   };
   const getPersonnelData = () => {
-    getPersonnel(page + 1, rowsPerPage).then((response) => {
+    getPersonnel(page + 1, rowsPerPage, type).then((response) => {
       setPersonnelData(response.data);
       setTotalPersonnel(response.total);
     });

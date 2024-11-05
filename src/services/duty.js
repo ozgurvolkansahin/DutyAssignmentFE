@@ -1,7 +1,7 @@
 import { fetcher } from '../utils/axios';
-export const insertDuties = async () => {
+export const insertDuties = async (type = 1) => {
     const res = await fetcher({
-        url: '/duty/InsertDuties',
+        url: `/duty/InsertDuties?type=${type}`,
         config: {
             headers: {
                 'Content-Type': 'application/json'
