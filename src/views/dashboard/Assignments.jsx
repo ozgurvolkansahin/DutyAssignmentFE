@@ -133,6 +133,7 @@ const PersonnelTable = () => {
   };
 
   const downloadPersonnelReportExcel = async (dutyId) => {
+    const dutyName = dutyData.find((duty) => duty.Duty.duty_id === dutyId).Duty.duty_description;
     await downloadPersonnelReport(dutyId)  // Yanıtı blob olarak al
     .then(blob => {
         // Blob'u bir URL'ye çevir
@@ -141,7 +142,7 @@ const PersonnelTable = () => {
         a.style.display = 'none';
         a.href = url;
         // set filename is dutyId_OdemeListesi.xlsx
-        a.download = `${dutyId}_OdemeListesi.xlsx`;
+        a.download = `${dutyId}_${dutyName}_OdemeListesi.xlsx`;
         document.body.appendChild(a);
         a.click();  // Simüle tıklama
         window.URL.revokeObjectURL(url);  // URL'i serbest bırak
