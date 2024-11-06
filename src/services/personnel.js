@@ -28,7 +28,7 @@ export const getPersonnelDuties = async (sicil, pageNumber, pageSize, isPaidDuti
     return res.data;
 }
 
-export const filterPersonnel = async (filters, page, pageSize) => {
+export const filterPersonnel = async (filters, page, pageSize, type) => {
     const res = await poster({
         url: `/personnel/filter`,
         config: {
@@ -36,7 +36,7 @@ export const filterPersonnel = async (filters, page, pageSize) => {
                 'Content-Type': 'application/json'
             }
         },
-        data: {...filters, page, pageSize}
+        data: {...filters, page, pageSize, type}
     });
     return res.data;
 }

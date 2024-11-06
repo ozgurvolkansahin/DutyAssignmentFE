@@ -12,7 +12,8 @@ import {
   Tooltip,
   IconButton,
   Modal,
-  Box
+  Box,
+  TableSortLabel
 } from '@mui/material';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { getPersonnel, getPersonnelDuties } from 'services/personnel';
@@ -49,6 +50,7 @@ const PersonnelTable = ({type}) => {
   const [modalPage, setModalPage] = useState(0);
   const [modalRowsPerPage, setModalRowsPerPage] = useState(10);
   const [totalDuties, setTotalDuties] = useState(0);
+  const [dutyCountDirection, setDutyCountDirection] = useState('desc');
 
   const [personnelData, setPersonnelData] = useState([]); // Personel verisi
   const [filters, setFilters] = useState({
@@ -60,12 +62,11 @@ const PersonnelTable = ({type}) => {
     nokta: '',
     grup: '',
     tel: '',
-    iban: ''
+    iban: '',
+    type,
   });
 
-  // useEffect(() => {
-  //   getPersonnelData();
-  // }, []);
+  
 
   useEffect(() => {
     getPersonnelData();
@@ -104,7 +105,7 @@ const PersonnelTable = ({type}) => {
 
   // Filtrelenmiş personel listesini getiren servis çağrısı (örnek)
   const fetchFilteredPersonnel = () => {
-    filterPersonnel(filters, page+1, rowsPerPage).then((response) => {
+    filterPersonnel(filters, page+1, rowsPerPage, type).then((response) => {
       setPersonnelData(response.data);
       setTotalPersonnel(response.total);
     });
@@ -125,7 +126,8 @@ const PersonnelTable = ({type}) => {
       nokta: '',
       grup: '',
       tel: '',
-      iban: ''
+      iban: '',
+      type,
     })
   };
   const getPersonnelData = () => {
@@ -160,6 +162,11 @@ const PersonnelTable = ({type}) => {
     setModalPage(0);
     setModalRowsPerPage(4);
   }
+  const createSortHandler = (property) => {
+    console.log(property);
+    setDutyCountDirection(dutyCountDirection === 'asc' ? 'desc' : 'asc');
+  };
+
   function defaultLabelDisplayedRows({ from, to, count }) {
     return ` ${count !== -1 ? count : `more than ${to}`} görevden ${from}–${to} gösteriliyor`;
   }
@@ -178,7 +185,15 @@ const PersonnelTable = ({type}) => {
             <TableCell>Grup</TableCell>
             <TableCell>Cep</TableCell>
             <TableCell>IBAN</TableCell>
-            <TableCell>Görev Sayısı</TableCell>
+            <TableCell>
+              <TableSortLabel
+                direction={dutyCountDirection}
+                active={true}
+                onClick={createSortHandler}
+              >
+                Görev Sayısı
+              </TableSortLabel>
+            </TableCell>
             <TableCell>Ödenen Görev Sayısı</TableCell>
           </TableRow>
         </TableHead>
@@ -211,8 +226,8 @@ const PersonnelTable = ({type}) => {
             <TableCell>
               <Input placeholder="IBAN" name="iban" value={filters.iban} onChange={handleFilterChange} />
             </TableCell>
-            <TableCell>Görevler</TableCell>
-            <TableCell>Ödemeler</TableCell>
+            <TableCell></TableCell>
+            <TableCell></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
