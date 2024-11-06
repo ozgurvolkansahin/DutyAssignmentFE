@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { getPersonnel, getPersonnelDuties } from 'services/personnel';
-import { debounce } from 'lodash';
+import { debounce, set } from 'lodash';
 import { filterPersonnel
 
  } from 'services/personnel';
@@ -50,6 +50,7 @@ const PersonnelTable = ({type}) => {
   const [modalPage, setModalPage] = useState(0);
   const [modalRowsPerPage, setModalRowsPerPage] = useState(10);
   const [totalDuties, setTotalDuties] = useState(0);
+  const [orderByField, setOrderByField] = useState('');
   const [dutyCountDirection, setDutyCountDirection] = useState('desc');
 
   const [personnelData, setPersonnelData] = useState([]); // Personel verisi
@@ -63,6 +64,8 @@ const PersonnelTable = ({type}) => {
     grup: '',
     tel: '',
     iban: '',
+    order: '',
+    orderBy: '',
     type,
   });
 
@@ -105,6 +108,7 @@ const PersonnelTable = ({type}) => {
 
   // Filtrelenmiş personel listesini getiren servis çağrısı (örnek)
   const fetchFilteredPersonnel = () => {
+    setPersonnelData([]);
     filterPersonnel(filters, page+1, rowsPerPage, type).then((response) => {
       setPersonnelData(response.data);
       setTotalPersonnel(response.total);
@@ -128,6 +132,8 @@ const PersonnelTable = ({type}) => {
       tel: '',
       iban: '',
       type,
+      order: '',
+      orderBy: ''
     })
   };
   const getPersonnelData = () => {
@@ -163,12 +169,17 @@ const PersonnelTable = ({type}) => {
     setModalRowsPerPage(4);
   }
   const createSortHandler = (property) => {
-    console.log(property);
+    setOrderByField(property);
     setDutyCountDirection(dutyCountDirection === 'asc' ? 'desc' : 'asc');
+    setFilters({
+      ...filters,
+      order: dutyCountDirection === 'asc' ? 'desc' : 'asc',
+      orderBy: property
+    });
   };
 
   function defaultLabelDisplayedRows({ from, to, count }) {
-    return ` ${count !== -1 ? count : `more than ${to}`} görevden ${from}–${to} gösteriliyor`;
+    return ` ${count !== -1 ? count : `more than ${to}`} personelden ${from}–${to} gösteriliyor`;
   }
 
   return (
@@ -188,13 +199,13 @@ const PersonnelTable = ({type}) => {
             <TableCell>
               <TableSortLabel
                 direction={dutyCountDirection}
-                active={true}
-                onClick={createSortHandler}
-              >
-                Görev Sayısı
-              </TableSortLabel>
-            </TableCell>
-            <TableCell>Ödenen Görev Sayısı</TableCell>
+                active={orderByField === 'dutiesCount'}
+                onClick={() => createSortHandler('dutiesCount')}>Görev Sayısı</TableSortLabel></TableCell>
+            <TableCell>
+              <TableSortLabel
+                direction={dutyCountDirection}
+                active={orderByField === 'paidDutiesCount'}
+                onClick={() => createSortHandler('paidDutiesCount')}>Ödenen Görev Sayısı</TableSortLabel></TableCell>
           </TableRow>
         </TableHead>
         <TableHead>
