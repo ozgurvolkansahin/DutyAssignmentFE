@@ -6,38 +6,29 @@ import Grid from '@mui/material/Grid';
 // project imports
 import EarningCard from './EarningCard';
 import Gorevlendirmeler from './Gorevlendirmeler';
-import PopularCard from './PopularCard';
-import TotalOrderLineChartCard from './TotalOrderLineChartCard';
-import TotalIncomeDarkCard from './TotalIncomeDarkCard';
-import TotalIncomeLightCard from './TotalIncomeLightCard';
-import TotalGrowthBarChart from './TotalGrowthBarChart';
+import GorevlendirilmisPersonel from './GorevlendirilmisPersonel';
 
 import { gridSpacing } from 'store/constant';
 
-// assets
-import StorefrontTwoToneIcon from '@mui/icons-material/StorefrontTwoTone';
-
 // services
-import { getDashboard } from 'services/dashboard';
+import { getBranchDashboard } from 'services/dashboard';
 import DutyTable from './DutyTable';
 // ==============================|| DEFAULT DASHBOARD ||============================== //
 
-const Dashboard = () => {
+const KadroAtama = ({ type }) => {
   const [isLoading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState({});
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  // if page or rowsPerPage changes, fetch the data again
   useEffect(() => {
     const fetchData = async () => {
-      const response = await getDashboard(page+1, rowsPerPage);
+      const response = await getBranchDashboard(page + 1, rowsPerPage, type);
       setDashboardData(response);
       setLoading(false);
     };
     fetchData();
   }, [page, rowsPerPage]);
-
 
   // Sayfa değişikliğini yönetir
   const handlePageChange = (newPage) => {
@@ -52,8 +43,11 @@ const Dashboard = () => {
   const deleteDuty = (data) => {
     // remove duty from the list
     const updatedData = dashboardData.assignmentLookupDuty.filter((duty) => duty.dutyId !== data);
-    setDashboardData({ ...dashboardData, assignmentLookupDuty: updatedData, waitingAssignmentsCount: dashboardData.waitingAssignmentsCount - 1 });
-
+    setDashboardData({
+      ...dashboardData,
+      assignmentLookupDuty: updatedData,
+      waitingAssignmentsCount: dashboardData.waitingAssignmentsCount - 1
+    });
   };
 
   // if isLoading is true then show the skeleton loader
@@ -65,31 +59,22 @@ const Dashboard = () => {
     <Grid container spacing={gridSpacing}>
       <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
-          <Grid item lg={3} md={6} sm={4} xs={12}>
-            <Gorevlendirmeler isLoading={isLoading} totalDuties={dashboardData.totalDuties} subText={`${dashboardData.totalAssignedPersonal} Görevlendirme`} />
+          <Grid item lg={4} md={6} sm={4} xs={12}>
+            <Gorevlendirmeler
+              isLoading={isLoading}
+              totalDuties={dashboardData.totalDuties}
+              subText={`${dashboardData.totalAssignedPersonal} Görevlendirme`}
+            />
           </Grid>
-          <Grid item lg={3} md={6} sm={4} xs={12}>
-            <TotalOrderLineChartCard isLoading={isLoading} totalAssignments={dashboardData.totalAssignments} />
+          <Grid item lg={4} md={6} sm={4} xs={12}>
+            <GorevlendirilmisPersonel isLoading={isLoading} totalAssignments={dashboardData.totalAssignments} />
           </Grid>
-          <Grid item lg={3} md={6} sm={4} xs={12}>
-            <EarningCard isLoading={isLoading} totalDuties={dashboardData.totalPaymentsDone} subText={`${dashboardData.totalPayments} Ödeme Yapılan Personel`} />
-          </Grid>
-          <Grid item lg={3} md={12} sm={12} xs={12}>
-            <Grid container spacing={gridSpacing}>
-              <Grid item sm={6} xs={12} md={6} lg={12}>
-                <TotalIncomeDarkCard isLoading={isLoading} />
-              </Grid>
-              <Grid item sm={6} xs={12} md={6} lg={12}>
-                <TotalIncomeLightCard
-                  {...{
-                    isLoading: isLoading,
-                    total: dashboardData.dashboard ? dashboardData.dashboard.systemAdmins.responsible : '',
-                    label: 'Sistem Sorumlusu',
-                    icon: <StorefrontTwoToneIcon fontSize="inherit" />
-                  }}
-                />
-              </Grid>
-            </Grid>
+          <Grid item lg={4} md={6} sm={4} xs={12}>
+            <EarningCard
+              isLoading={isLoading}
+              totalDuties={dashboardData.totalPaymentsDone}
+              subText={`${dashboardData.totalPayments} Ödeme Yapılan Personel`}
+            />
           </Grid>
         </Grid>
       </Grid>
@@ -98,6 +83,7 @@ const Dashboard = () => {
           <Grid item xs={12} md={12}>
             {/* <TotalGrowthBarChart isLoading={isLoading} /> */}
             <DutyTable
+              type={type}
               isLoading={isLoading}
               data={dashboardData}
               page={page}
@@ -108,13 +94,10 @@ const Dashboard = () => {
               onDeleteDuty={deleteDuty}
             />
           </Grid>
-          {/* <Grid item xs={12} md={3}>
-            <PopularCard isLoading={isLoading} />
-          </Grid> */}
         </Grid>
       </Grid>
     </Grid>
   );
 };
 
-export default Dashboard;
+export default KadroAtama;

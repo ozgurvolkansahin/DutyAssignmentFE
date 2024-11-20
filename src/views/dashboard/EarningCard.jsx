@@ -36,10 +36,9 @@ const EarningCard = ({ isLoading, totalDuties, subText }) => {
     // call insertDuties function
     insertDuties().then((response) => {
       console.log(response);
-    // reload page
-    window.location.reload();
+      // reload page
+      window.location.reload();
     });
-
   };
 
   return (
@@ -101,7 +100,7 @@ const EarningCard = ({ isLoading, totalDuties, subText }) => {
               <Grid item>
                 <Grid container alignItems="center">
                   <Grid item>
-                    <Typography sx={{ fontSize: '2.125rem', fontWeight: 500, mr: 1, mt: 1.75, mb: 0.75 }}>{totalDuties} Ödeme</Typography>
+                    <Typography sx={{ fontSize: '2.125rem', fontWeight: 500, mr: 1, mt: 1.75, mb: 0.75 }}>{totalDuties}</Typography>
                   </Grid>
                   <Grid item>
                     <Avatar

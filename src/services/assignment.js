@@ -22,9 +22,9 @@ export const getPaidAssignments = async (pageNumber, pageSize) => {
     return res;
 }
 
-export const downloadPersonnelReport = async (dutyId) => {
+export const downloadPersonnelReport = async (dutyId, type) => {
     const res = await fetcher({
-        url: `/assignment/DownloadPersonalReportForSpecificDuty?dutyId=${dutyId}`,
+        url: `/assignment/DownloadPersonalReportForSpecificDuty?dutyId=${dutyId}&type=${type}`,
         config: {
             headers: {
                 'Content-Type': 'application/json'

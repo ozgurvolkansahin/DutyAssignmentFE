@@ -42,7 +42,7 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 
 // ==============================|| DASHBOARD - TOTAL INCOME LIGHT CARD ||============================== //
 
-const TotalIncomeLightCard = ({ isLoading, total, icon, label }) => {
+const SistemSorumlusu = ({ isLoading, total, icon, label }) => {
   const theme = useTheme();
 
   return (
@@ -85,11 +85,11 @@ const TotalIncomeLightCard = ({ isLoading, total, icon, label }) => {
   );
 };
 
-TotalIncomeLightCard.propTypes = {
+SistemSorumlusu.propTypes = {
   icon: PropTypes.object,
   label: PropTypes.string,
   total: PropTypes.any,
   isLoading: PropTypes.bool
 };
 
-export default TotalIncomeLightCard;
+export default SistemSorumlusu;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Table,
   TableBody,
@@ -12,29 +12,35 @@ import {
   TablePagination,
   Paper,
   Input
-} from "@mui/material";
+} from '@mui/material';
 
-import { getAssignedPersonalByDutyIdWithPagination, getPaidAssignments, downloadPersonnelReport, getFilteredAssignments, resetAssignment } from "services/assignment";
+import {
+  getAssignedPersonalByDutyIdWithPagination,
+  getPaidAssignments,
+  downloadPersonnelReport,
+  getFilteredAssignments,
+  resetAssignment
+} from 'services/assignment';
 import { debounce } from 'lodash';
 
 const modalStyle = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
   height: '85%',
   width: '75%',
   overflow: 'scroll',
-  bgcolor: "background.paper",
-  border: "2px solid #000",
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
   boxShadow: 24,
-  p: 4,
+  p: 4
 };
 
-const PersonnelTable = () => {
+const PersonnelTable = ({ type }) => {
   const [filters, setFilters] = useState({
     dutyId: '',
-    dutyDescription: '',
+    dutyDescription: ''
   });
 
   const [open, setOpen] = useState(false);
@@ -56,17 +62,14 @@ const PersonnelTable = () => {
   // Personel verisini getirme
   // sayfa açılırken değil sadece çağrıldığı zaman çalışacak
   const getPersonnelData = async () => {
-    const response = await getAssignedPersonalByDutyIdWithPagination(
-      selectedDuty.Duty.duty_id,
-      modalPage+1,
-      modalRowsPerPage
-    ).then((res) => {
-      return res;
-    });
+    const response = await getAssignedPersonalByDutyIdWithPagination(selectedDuty.Duty.duty_id, modalPage + 1, modalRowsPerPage).then(
+      (res) => {
+        return res;
+      }
+    );
     setPersonnelData(response.data.data);
     setTotalPersonnel(response.data.total);
     // get total from response and set it for pagination
-    
   };
 
   const resetPaidAssignment = async (dutyId) => {
@@ -83,7 +86,7 @@ const PersonnelTable = () => {
   };
 
   const getPaidAssignmentsCall = async () => {
-    const response = await getPaidAssignments(page+1, rowsPerPage).then((res) => {
+    const response = await getPaidAssignments(page + 1, rowsPerPage).then((res) => {
       return res;
     });
     setDutyData(response.data.data ?? []);
@@ -96,8 +99,13 @@ const PersonnelTable = () => {
       getPersonnelData();
     }
   }, [modalPage, modalRowsPerPage]);
+
   useEffect(() => {
-    getPaidAssignmentsCall();
+    if (filters.dutyId === '' && filters.dutyDescription === '') {
+      getPaidAssignmentsCall();
+    } else {
+      getFilteredAssignmentsApi();
+    }
   }, [page, rowsPerPage]);
 
   const handleOpen = async (row) => {
@@ -121,11 +129,11 @@ const PersonnelTable = () => {
     // Cleanup function to cancel the debounce if filters change before the delay
     return () => {
       debouncedFetchFilteredAssignments.cancel();
-  };
-  }, [filters]);  // Filters state'i izleniyor
+    };
+  }, [filters]); // Filters state'i izleniyor
 
   const getFilteredAssignmentsApi = async () => {
-    const response = await getFilteredAssignments(filters, page+1, rowsPerPage).then((res) => {
+    const response = await getFilteredAssignments(filters, page + 1, rowsPerPage).then((res) => {
       return res;
     });
     setDutyData(response.data ?? []);
@@ -134,8 +142,8 @@ const PersonnelTable = () => {
 
   const downloadPersonnelReportExcel = async (dutyId) => {
     const dutyName = dutyData.find((duty) => duty.Duty.duty_id === dutyId).Duty.duty_description;
-    await downloadPersonnelReport(dutyId)  // Yanıtı blob olarak al
-    .then(blob => {
+    await downloadPersonnelReport(dutyId, type) // Yanıtı blob olarak al
+      .then((blob) => {
         // Blob'u bir URL'ye çevir
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -144,10 +152,10 @@ const PersonnelTable = () => {
         // set filename is dutyId_OdemeListesi.xlsx
         a.download = `${dutyId}_${dutyName}_OdemeListesi.xlsx`;
         document.body.appendChild(a);
-        a.click();  // Simüle tıklama
-        window.URL.revokeObjectURL(url);  // URL'i serbest bırak
-    })
-    .catch(error => console.error('Download error:', error));  // Hataları yakala
+        a.click(); // Simüle tıklama
+        window.URL.revokeObjectURL(url); // URL'i serbest bırak
+      })
+      .catch((error) => console.error('Download error:', error)); // Hataları yakala
   };
   useEffect(() => {
     if (selectedDuty) {
@@ -159,7 +167,7 @@ const PersonnelTable = () => {
   const handleClose = () => {
     setSelectedDuty(null);
     setOpen(false);
-  }
+  };
 
   // Ana tablo için sayfa değişimi
   const handleChangePage = (event, newPage) => {
@@ -190,15 +198,29 @@ const PersonnelTable = () => {
   function defaultLabelDisplayedRows({ from, to, count }) {
     return ` ${count !== -1 ? count : `more than ${to}`} görevden ${from}–${to} gösteriliyor`;
   }
+  function getBranchDefinitionByType(type) {
+    // 1: 'Kadro' 2: 'Şube' 3: 'Çevik'
+    switch (type) {
+      case 1:
+        return 'Kadro';
+      case 2:
+        return 'Şube';
+      case 3:
+        return 'Çevik';
+      default:
+        return 'Tanımsız';
+    }
+  }
   return (
     <div>
       {/* Ana tablo */}
-      <TableContainer  component={Paper}>
+      <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
               <TableCell>Görev Numarası</TableCell>
               <TableCell>Açıklama</TableCell>
+              <TableCell>Tip</TableCell>
               <TableCell>Tarih</TableCell>
               <TableCell>Sorumlu Personel</TableCell>
               <TableCell>Görevli Personel</TableCell>
@@ -208,20 +230,21 @@ const PersonnelTable = () => {
             </TableRow>
           </TableHead>
           <TableHead>
-          <TableRow>
-            <TableCell>
-              <Input placeholder="Görev Numarası" name="dutyId" value={filters.duty_id} onChange={handleFilterChange} />
-            </TableCell>
-            <TableCell>
-              <Input placeholder="Açıklama" name="dutyDescription" value={filters.duty_description} onChange={handleFilterChange} />
-            </TableCell>
-          </TableRow>
-        </TableHead>
+            <TableRow>
+              <TableCell>
+                <Input placeholder="Görev Numarası" name="dutyId" value={filters.duty_id} onChange={handleFilterChange} />
+              </TableCell>
+              <TableCell>
+                <Input placeholder="Açıklama" name="dutyDescription" value={filters.duty_description} onChange={handleFilterChange} />
+              </TableCell>
+            </TableRow>
+          </TableHead>
           <TableBody>
-            {dutyData.map((row) => (
-              <TableRow key={row.Duty.duty_id}>
+            {dutyData.map((row, i) => (
+              <TableRow key={row.Duty.duty_id * i}>
                 <TableCell>{row.Duty.duty_id}</TableCell>
                 <TableCell>{row.Duty.duty_description}</TableCell>
+                <TableCell>{getBranchDefinitionByType(row.Duty.type)}</TableCell>
                 <TableCell>{new Date(row.Duty.date).toLocaleDateString()}</TableCell>
                 <TableCell>{row.ResponsibleManagersCount}</TableCell>
                 <TableCell>{row.PoliceAttendantsCount}</TableCell>
@@ -256,7 +279,6 @@ const PersonnelTable = () => {
           onRowsPerPageChange={handleChangeRowsPerPage}
           labelRowsPerPage="Sayfa Başına Veri Sayısı"
           labelDisplayedRows={defaultLabelDisplayedRows}
-
         />
       </TableContainer>
 
@@ -278,8 +300,8 @@ const PersonnelTable = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {personnelData.length > 0 && personnelData
-                .map((person) => (
+              {personnelData.length > 0 &&
+                personnelData.map((person) => (
                   <TableRow key={person.sicil}>
                     <TableCell>{person.sicil}</TableCell>
                     <TableCell>{person.tcKimlik}</TableCell>

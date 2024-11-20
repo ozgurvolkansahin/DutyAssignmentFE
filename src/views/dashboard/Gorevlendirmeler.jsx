@@ -24,7 +24,8 @@ import { Button } from '@mui/material';
 
 // ===========================|| DASHBOARD DEFAULT - EARNING CARD ||=========================== //
 
-const Gorevlendirmeler = ({ isLoading, totalDuties, subText }) => {
+const Gorevlendirmeler = ({ isLoading, totalDuties, subText, showUploader, branch }) => {
+  showUploader = showUploader == undefined ? false : showUploader;
   const theme = useTheme();
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -38,33 +39,35 @@ const Gorevlendirmeler = ({ isLoading, totalDuties, subText }) => {
   };
   const processDuties = (type) => {
     // call insertDuties function
-    insertDuties(type).then((response) => {
-      if (response.status === 200) {
-        // reload page
-        alert('Görevler başarıyla işlendi. Ekran yeniden yüklenecek.');
-        window.location.reload();
-      }
-    }).catch((error) => {
-      console.error(error);
-      alert('Görevler işlenirken bir hata oluştu.');
-      setAnchorEl(false);
-
-    });
+    insertDuties(type)
+      .then((response) => {
+        if (response.status === 200) {
+          // reload page
+          alert('Görevler başarıyla işlendi. Ekran yeniden yüklenecek.');
+          window.location.reload();
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        alert('Görevler işlenirken bir hata oluştu.');
+        setAnchorEl(false);
+      });
   };
   const processPayments = () => {
     // call insertDuties function
-    insertPayments().then((response) => {
-      if (response.status === 200) {
-        // reload page
-        alert('Ödemeler başarıyla işlendi. Ekran yeniden yüklenecek.');
-        window.location.reload();
-      }
-    }).catch((error) => {
-      console.error(error);
-      alert('Ödemeler işlenirken bir hata oluştu.');
-      setAnchorEl(false);
-
-    });
+    insertPayments()
+      .then((response) => {
+        if (response.status === 200) {
+          // reload page
+          alert('Ödemeler başarıyla işlendi. Ekran yeniden yüklenecek.');
+          window.location.reload();
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        alert('Ödemeler işlenirken bir hata oluştu.');
+        setAnchorEl(false);
+      });
   };
 
   return (
@@ -120,67 +123,72 @@ const Gorevlendirmeler = ({ isLoading, totalDuties, subText }) => {
                       <img src={EarningIcon} alt="Notification" />
                     </Avatar>
                   </Grid>
-                  <Grid item>
-                    <Avatar
-                      variant="rounded"
-                      sx={{
-                        ...theme.typography.commonAvatar,
-                        ...theme.typography.mediumAvatar,
-                        bgcolor: 'secondary.dark',
-                        color: 'secondary.200',
-                        zIndex: 1
-                      }}
-                      aria-controls="menu-earning-card"
-                      aria-haspopup="true"
-                      onClick={handleClick}
-                    >
-                      <MoreHorizIcon fontSize="inherit" />
-                    </Avatar>
-                    <Menu
-                      id="menu-earning-card"
-                      anchorEl={anchorEl}
-                      keepMounted
-                      open={Boolean(anchorEl)}
-                      onClose={handleClose}
-                      variant="selectedMenu"
-                      anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'right'
-                      }}
-                      transformOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right'
-                      }}
-                    >
-                      <MenuItem>
-                        <Button onClick={() => processDuties(1)} >
-                          <GetAppTwoToneIcon sx={{ mr: 1.75 }} /> Kadro Görevlerini İşle
-                        </Button>
-                      </MenuItem>
-                      <MenuItem>
-                      <Button onClick={() => processDuties(2)} >
-                          <GetAppTwoToneIcon sx={{ mr: 1.75 }} /> Şube Görevlerini İşle
-                        </Button>
+                  {showUploader && (
+                    <Grid item>
+                      <Avatar
+                        variant="rounded"
+                        sx={{
+                          ...theme.typography.commonAvatar,
+                          ...theme.typography.mediumAvatar,
+                          bgcolor: 'secondary.dark',
+                          color: 'secondary.200',
+                          zIndex: 1
+                        }}
+                        aria-controls="menu-earning-card"
+                        aria-haspopup="true"
+                        onClick={handleClick}
+                      >
+                        <MoreHorizIcon fontSize="inherit" />
+                      </Avatar>
+                      {/* show menu if showUploader is set true */}
 
-                      </MenuItem>
-                      <MenuItem>
-                      <Button onClick={() => processDuties(3)} >
-                          <GetAppTwoToneIcon sx={{ mr: 1.75 }} /> Çevik Görevlerini İşle
-                        </Button>
-                      </MenuItem>
-                      <MenuItem>
-                        <Button onClick={processPayments} >
-                          <GetAppTwoToneIcon sx={{ mr: 1.75 }} /> Ödemeleri İşle
-                        </Button>
-                      </MenuItem>
-                    </Menu>
-                  </Grid>
+                      <Menu
+                        id="menu-earning-card"
+                        anchorEl={anchorEl}
+                        keepMounted
+                        open={Boolean(anchorEl)}
+                        onClose={handleClose}
+                        variant="selectedMenu"
+                        anchorOrigin={{
+                          vertical: 'bottom',
+                          horizontal: 'right'
+                        }}
+                        transformOrigin={{
+                          vertical: 'top',
+                          horizontal: 'right'
+                        }}
+                      >
+                        <MenuItem>
+                          <Button onClick={() => processDuties(1)}>
+                            <GetAppTwoToneIcon sx={{ mr: 1.75 }} /> Kadro Görevlerini İşle
+                          </Button>
+                        </MenuItem>
+                        <MenuItem>
+                          <Button onClick={() => processDuties(2)}>
+                            <GetAppTwoToneIcon sx={{ mr: 1.75 }} /> Şube Görevlerini İşle
+                          </Button>
+                        </MenuItem>
+                        <MenuItem>
+                          <Button onClick={() => processDuties(3)}>
+                            <GetAppTwoToneIcon sx={{ mr: 1.75 }} /> Çevik Görevlerini İşle
+                          </Button>
+                        </MenuItem>
+                        <MenuItem>
+                          <Button onClick={processPayments}>
+                            <GetAppTwoToneIcon sx={{ mr: 1.75 }} /> Ödemeleri İşle
+                          </Button>
+                        </MenuItem>
+                      </Menu>
+                    </Grid>
+                  )}
                 </Grid>
               </Grid>
               <Grid item>
                 <Grid container alignItems="center">
                   <Grid item>
-                    <Typography sx={{ fontSize: '2.125rem', fontWeight: 500, mr: 1, mt: 1.75, mb: 0.75 }}>{totalDuties} Görev</Typography>
+                    <Typography sx={{ fontSize: '2.125rem', fontWeight: 500, mr: 1, mt: 1.75, mb: 0.75 }}>
+                      {totalDuties} {branch} Görevi
+                    </Typography>
                   </Grid>
                 </Grid>
               </Grid>

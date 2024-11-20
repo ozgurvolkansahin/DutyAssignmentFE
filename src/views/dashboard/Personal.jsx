@@ -18,9 +18,7 @@ import {
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { getPersonnel, getPersonnelDuties } from 'services/personnel';
 import { debounce, set } from 'lodash';
-import { filterPersonnel
-
- } from 'services/personnel';
+import { filterPersonnel } from 'services/personnel';
 const modalStyle = {
   position: 'absolute',
   top: '50%',
@@ -36,7 +34,7 @@ const modalStyle = {
   p: 4
 };
 
-const PersonnelTable = ({type}) => {
+const PersonnelTable = ({ type }) => {
   // add paginator states
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -66,10 +64,8 @@ const PersonnelTable = ({type}) => {
     iban: '',
     order: '',
     orderBy: '',
-    type,
+    type
   });
-
-  
 
   useEffect(() => {
     getPersonnelData();
@@ -97,8 +93,8 @@ const PersonnelTable = ({type}) => {
     // Cleanup function to cancel the debounce if filters change before the delay
     return () => {
       debouncedFetchFilteredPersonnel.cancel();
-  };
-  }, [filters, type]);  // Filters state'i izleniyor
+    };
+  }, [filters, type]); // Filters state'i izleniyor
 
   // Arama alanı değişikliklerini yakalayacak fonksiyon
   const handleFilterChange = (e) => {
@@ -109,7 +105,7 @@ const PersonnelTable = ({type}) => {
   // Filtrelenmiş personel listesini getiren servis çağrısı (örnek)
   const fetchFilteredPersonnel = () => {
     setPersonnelData([]);
-    filterPersonnel(filters, page+1, rowsPerPage, type).then((response) => {
+    filterPersonnel(filters, page + 1, rowsPerPage, type).then((response) => {
       setPersonnelData(response.data);
       setTotalPersonnel(response.total);
     });
@@ -134,7 +130,7 @@ const PersonnelTable = ({type}) => {
       type,
       order: '',
       orderBy: ''
-    })
+    });
   };
   const getPersonnelData = () => {
     getPersonnel(page + 1, rowsPerPage, type).then((response) => {
@@ -144,12 +140,12 @@ const PersonnelTable = ({type}) => {
   };
   useEffect(() => {
     if (selectedPersonnel) {
-        getPersonnelDutiesApiCall();
+      getPersonnelDutiesApiCall();
     }
-}, [selectedPersonnel]);
+  }, [selectedPersonnel]);
 
   const getPersonnelDutiesApiCall = () => {
-    getPersonnelDuties(selectedPersonnel.sicil, modalPage, modalRowsPerPage, isPaidDuties).then((response) => {
+    getPersonnelDuties(selectedPersonnel.sicil, modalPage, modalRowsPerPage, isPaidDuties, type).then((response) => {
       setDutiesData(response);
       setOpenModal(true);
     });
@@ -157,7 +153,7 @@ const PersonnelTable = ({type}) => {
   const handleOpenModal = async (person, isPaidDutiesBool) => {
     setSelectedPersonnel(person);
     setIsPaidDuties(isPaidDutiesBool);
-    isPaidDuties ? setTotalDuties(person.paidDutiesCount) : setTotalDuties(person.dutiesCount);
+    // isPaidDuties ? setTotalDuties(person.paidDutiesCount) : setTotalDuties(person.dutiesCount);
   };
 
   const handleCloseModal = () => {
@@ -166,8 +162,9 @@ const PersonnelTable = ({type}) => {
     setSelectedPersonnel(null);
     setIsPaidDuties(false);
     setModalPage(0);
-    setModalRowsPerPage(4);
-  }
+    setModalRowsPerPage(10);
+    setTotalDuties(0);
+  };
   const createSortHandler = (property) => {
     setOrderByField(property);
     setDutyCountDirection(dutyCountDirection === 'asc' ? 'desc' : 'asc');
@@ -185,7 +182,7 @@ const PersonnelTable = ({type}) => {
   return (
     <TableContainer component={Paper}>
       <Table>
-      <TableHead>
+        <TableHead>
           <TableRow>
             <TableCell>Sicil</TableCell>
             <TableCell>TC Kimlik</TableCell>
@@ -200,12 +197,20 @@ const PersonnelTable = ({type}) => {
               <TableSortLabel
                 direction={dutyCountDirection}
                 active={orderByField === 'dutiesCount'}
-                onClick={() => createSortHandler('dutiesCount')}>Görev Sayısı</TableSortLabel></TableCell>
+                onClick={() => createSortHandler('dutiesCount')}
+              >
+                Görev Sayısı
+              </TableSortLabel>
+            </TableCell>
             <TableCell>
               <TableSortLabel
                 direction={dutyCountDirection}
                 active={orderByField === 'paidDutiesCount'}
-                onClick={() => createSortHandler('paidDutiesCount')}>Ödenen Görev Sayısı</TableSortLabel></TableCell>
+                onClick={() => createSortHandler('paidDutiesCount')}
+              >
+                Ödenen Görev Sayısı
+              </TableSortLabel>
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableHead>
@@ -262,7 +267,12 @@ const PersonnelTable = ({type}) => {
                 >
                   {person.dutiesCount}{' '}
                   <Tooltip title="Görevleri görmek için tıklayınız">
-                    <IconButton onClick={() => handleOpenModal(person, false, person.dutiesCount)}>
+                    <IconButton
+                      onClick={() => {
+                        setTotalDuties(person.dutiesCount);
+                        handleOpenModal(person, false, person.dutiesCount);
+                      }}
+                    >
                       <HelpOutlineIcon />
                     </IconButton>
                   </Tooltip>
@@ -274,7 +284,12 @@ const PersonnelTable = ({type}) => {
                 >
                   {person.paidDutiesCount}
                   <Tooltip title="Görevleri görmek için tıklayınız">
-                    <IconButton onClick={() => handleOpenModal(person, true, person.paidDutiesCount)}>
+                    <IconButton
+                      onClick={() => {
+                        setTotalDuties(person.paidDutiesCount);
+                        handleOpenModal(person, true, person.paidDutiesCount);
+                      }}
+                    >
                       <HelpOutlineIcon />
                     </IconButton>
                   </Tooltip>
@@ -293,17 +308,11 @@ const PersonnelTable = ({type}) => {
         onRowsPerPageChange={handleChangeRowsPerPage}
         labelRowsPerPage="Sayfa Başına Veri Sayısı"
         labelDisplayedRows={defaultLabelDisplayedRows}
-
       />
 
       {/* Modal */}
 
-      <Modal
-        open={openModal}
-        onClose={handleCloseModal}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
+      <Modal open={openModal} onClose={handleCloseModal} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
         <Box sx={modalStyle}>
           <Table>
             <TableHead>

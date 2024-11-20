@@ -10,7 +10,7 @@ export const getPersonnel = async (pageNumber, pageSize, type) => {
     });
     return res.data;
 }
-export const getPersonnelDuties = async (sicil, pageNumber, pageSize, isPaidDuties) => {
+export const getPersonnelDuties = async (sicil, pageNumber, pageSize, isPaidDuties, type) => {
     const res = await poster({
         url: `/duty/GetDutiesByIdList`,
         config: {
@@ -22,7 +22,8 @@ export const getPersonnelDuties = async (sicil, pageNumber, pageSize, isPaidDuti
             sicil: sicil,
             page: pageNumber+1,
             pageSize: pageSize,
-            isPaidDuties: isPaidDuties
+            isPaidDuties: isPaidDuties,
+            type: type
         }
     });
     return res.data;

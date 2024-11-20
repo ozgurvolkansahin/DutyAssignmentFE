@@ -19,7 +19,7 @@ import LocalMallOutlinedIcon from '@mui/icons-material/LocalMallOutlined';
 import PersonIcon from '@mui/icons-material/Person';
 // ==============================|| DASHBOARD - TOTAL ORDER LINE CHART CARD ||============================== //
 
-const TotalOrderLineChartCard = ({ isLoading, totalAssignments }) => {
+const GorevlendirilmisPersonel = ({ isLoading, totalAssignments }) => {
   const theme = useTheme();
 
   const [timeValue, setTimeValue] = React.useState(false);
@@ -137,8 +137,8 @@ const TotalOrderLineChartCard = ({ isLoading, totalAssignments }) => {
   );
 };
 
-TotalOrderLineChartCard.propTypes = {
+GorevlendirilmisPersonel.propTypes = {
   isLoading: PropTypes.bool
 };
 
-export default TotalOrderLineChartCard;
+export default GorevlendirilmisPersonel;

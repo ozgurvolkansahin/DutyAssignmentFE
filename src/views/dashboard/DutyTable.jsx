@@ -20,9 +20,8 @@ import { assignToDuty, getAssignedPersonalByDutyIdWithPagination } from 'service
 import { downloadPersonnelReport } from 'services/assignment';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
 import { deleteDuty } from 'services/duty';
-import { set } from 'immutable';
 
-const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange, totalDuties, onDeleteDuty }) => {
+const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange, totalDuties, onDeleteDuty, type }) => {
   const [open, setOpen] = useState(false); // Modal açık/kapalı durumu
   const [personnelModalOpen, setPersonnelModalOpen] = useState(false); // Modal açık/kapalı durumu
 
@@ -54,17 +53,17 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
   };
 
   const personnelModalStyle = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
     height: '85%',
     width: '75%',
     overflow: 'scroll',
-    bgcolor: "background.paper",
-    border: "2px solid #000",
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
     boxShadow: 24,
-    p: 4,
+    p: 4
   };
   const handleOpen = (duty) => {
     setSelectedDuty(duty); // Hangi kişiye tıklandığını al
@@ -73,21 +72,21 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
 
   const handleDelete = async () => {
     // İlgili işlemleri burada yapabilirsiniz
-    const response = await deleteDuty(selectedDuty.dutyId)
-    .then((res) => {
-      return res;
-    })
-    .then(() => {
-      alert("Görev başarıyla silindi. Ekran yeniden yüklenecek.");
-      handleDeleteClose(); // Atama yapıldıktan sonra modal kapatılır
-    })
-    .catch((err) => {
-      if (err.data === "ASSIGNMENT_EXISTS") {
-        alert("Bu göreve bir atama yapıldığı için görev silinemez.");
-      } else {
-        alert("Bir hata oluştu. Lütfen tekrar deneyin.");
-      }
-    });
+    const response = await deleteDuty(selectedDuty.dutyId, type)
+      .then((res) => {
+        return res;
+      })
+      .then(() => {
+        alert('Görev başarıyla silindi. Ekran yeniden yüklenecek.');
+        handleDeleteClose(); // Atama yapıldıktan sonra modal kapatılır
+      })
+      .catch((err) => {
+        if (err.data === 'ASSIGNMENT_EXISTS') {
+          alert('Bu göreve bir atama yapıldığı için görev silinemez.');
+        } else {
+          alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+        }
+      });
   };
   // Modal kapatma
   const handleClose = () => {
@@ -99,42 +98,38 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
   const handleDeleteClose = () => {
     window.location.reload();
   };
-  
+
   const getPersonnelData = async () => {
-    const response = await getAssignedPersonalByDutyIdWithPagination(
-      selectedDuty.dutyId,
-      modalPage+1,
-      modalRowsPerPage
-    ).then((res) => {
+    const response = await getAssignedPersonalByDutyIdWithPagination(selectedDuty.dutyId, modalPage + 1, modalRowsPerPage).then((res) => {
       return res;
     });
     setPersonnelData(response.data.data);
     setTotalPersonnel(response.data.total);
     setPersonnelModalOpen(true);
     // get total from response and set it for pagination
-    
   };
   // Atama yap butonu için fonksiyon
   const handleAssignment = async () => {
     // İlgili işlemleri burada yapabilirsiniz
     const response = await assignToDuty({
       dutyIds: [selectedDuty.dutyId],
-      assignmentCount: +assignmentCount
+      assignmentCount: +assignmentCount,
+      type
     })
-    .then((res) => {
-      return res;
-    })
-    .then(() => {
-      handleClose(); // Atama yapıldıktan sonra modal kapatılır
-      getPersonnelData(); // Atama yapıldıktan sonra personel listesini günceller
-    })
-    .catch((err) => {
-      if (err.data === "TOO_MANY_PEOPLE_TO_SELECT") {
-        alert("Atanacak personel sayısı, atanacak personel sayısından fazla olamaz.");
-      } else {
-        alert("Bir hata oluştu. Lütfen tekrar deneyin.");
-      }
-    });
+      .then((res) => {
+        return res;
+      })
+      .then(() => {
+        handleClose(); // Atama yapıldıktan sonra modal kapatılır
+        getPersonnelData(); // Atama yapıldıktan sonra personel listesini günceller
+      })
+      .catch((err) => {
+        if (err.data === 'TOO_MANY_PEOPLE_TO_SELECT') {
+          alert('Atanacak personel sayısı, atanacak personel sayısından fazla olamaz.');
+        } else {
+          alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+        }
+      });
   };
   // Handle pagination change
   const handleChangePage = (event, newPage) => {
@@ -172,7 +167,7 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
     setSelectedDuty(null); // Hangi kişiye tıklandığını al
     setDeleteOpen(false);
   };
-  
+
   const handleCancel = () => {
     setConfirmOpen(false); // Onay modalını kapat
   };
@@ -181,23 +176,23 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
     // onDeleteDuty(selectedDuty.dutyId); // Atama yapılan görevi ana listeden sil
     // setSelectedDuty(null);
     // setPersonnelModalOpen(false); // Onay modalını kapat
-    
+
     window.location.reload();
   };
 
-    // Modal'daki tablo için sayfa değişimi
-    const handleModalChangePage = (event, newPage) => {
-      setModalPage(newPage);
-    };
-  
-    // Modal'daki tablo için satır sayısı değişimi
-    const handleModalChangeRowsPerPage = (event) => {
-      setModalRowsPerPage(parseInt(event.target.value, 10));
-      setModalPage(0);
-    };
-   const onPersonnelExcelDownload = async () => {
-    await downloadPersonnelReport(selectedDuty.dutyId)  // Yanıtı blob olarak al
-    .then(blob => {
+  // Modal'daki tablo için sayfa değişimi
+  const handleModalChangePage = (event, newPage) => {
+    setModalPage(newPage);
+  };
+
+  // Modal'daki tablo için satır sayısı değişimi
+  const handleModalChangeRowsPerPage = (event) => {
+    setModalRowsPerPage(parseInt(event.target.value, 10));
+    setModalPage(0);
+  };
+  const onPersonnelExcelDownload = async () => {
+    await downloadPersonnelReport(selectedDuty.dutyId, type) // Yanıtı blob olarak al
+      .then((blob) => {
         // Blob'u bir URL'ye çevir
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -206,11 +201,11 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
         // set filename is dutyId_OdemeListesi.xlsx
         a.download = `${selectedDuty.dutyId}_OdemeListesi.xlsx`;
         document.body.appendChild(a);
-        a.click();  // Simüle tıklama
-        window.URL.revokeObjectURL(url);  // URL'i serbest bırak
-    })
-    .catch(error => console.error('Download error:', error));  // Hataları yakala
-   }
+        a.click(); // Simüle tıklama
+        window.URL.revokeObjectURL(url); // URL'i serbest bırak
+      })
+      .catch((error) => console.error('Download error:', error)); // Hataları yakala
+  };
   function defaultLabelDisplayedRows({ from, to, count }) {
     return ` ${count !== -1 ? count : `more than ${to}`} görevden ${from}–${to} gösteriliyor`;
   }
@@ -306,7 +301,7 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
       {/* Atama Listesi Modal */}
       <Modal open={personnelModalOpen} onClose={handlePersonnelModalClose}>
         <Box sx={personnelModalStyle}>
-        <IconButton
+          <IconButton
             aria-label="close"
             onClick={handlePersonnelModalClose}
             sx={{ position: 'absolute', top: '8px', right: '8px' }} // X ikonu sağ üst köşede konumlanır

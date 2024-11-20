@@ -11,9 +11,9 @@ export const insertDuties = async (type = 1) => {
     return res;
 }
 
-export const deleteDuty = async (dutyId) => {
+export const deleteDuty = async (dutyId, type) => {
     const res = await fetcher({
-        url: `/duty/Delete?dutyId=${dutyId}`,
+        url: `/duty/Delete?dutyId=${dutyId}&type=${type}`,
         config: {
             headers: {
                 'Content-Type': 'application/json'

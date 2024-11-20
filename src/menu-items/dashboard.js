@@ -20,6 +20,22 @@ const dashboard = {
       breadcrumbs: false
     },
     {
+      id: 'kadro',
+      title: 'Kadro',
+      type: 'item',
+      url: '/kadro',
+      icon: icons.IconDashboard,
+      breadcrumbs: false
+    },
+    {
+      id: 'sube',
+      title: 'Şube',
+      type: 'item',
+      url: '/sube',
+      icon: icons.IconDashboard,
+      breadcrumbs: false
+    },
+    {
       id: 'assignments',
       title: 'Ödemeler',
       type: 'item',
@@ -28,10 +44,18 @@ const dashboard = {
       breadcrumbs: false
     },
     {
-      id: 'kadro',
+      id: 'kadro-personel',
       title: 'Kadro Personel',
       type: 'item',
-      url: '/kadro',
+      url: '/kadro-personel',
+      icon: icons.IconDashboard,
+      breadcrumbs: false
+    },
+    {
+      id: 'sube-personel',
+      title: 'Şube Personel',
+      type: 'item',
+      url: '/sube-personel',
       icon: icons.IconDashboard,
       breadcrumbs: false
     },
