@@ -15,13 +15,13 @@ import {
 } from '@mui/material';
 
 import {
-  getAssignedPersonalByDutyIdWithPagination,
+  GetAssignedPersonalByDutyIdAndTypeWithPagination,
   getPaidAssignments,
   downloadPersonnelReport,
   getFilteredAssignments,
   resetAssignment
 } from 'services/assignment';
-import { debounce } from 'lodash';
+import { debounce, set } from 'lodash';
 
 const modalStyle = {
   position: 'absolute',
@@ -47,6 +47,7 @@ const PersonnelTable = ({ type }) => {
   const [personnelData, setPersonnelData] = useState([]);
   const [selectedDuty, setSelectedDuty] = useState(null);
   const [dutyData, setDutyData] = useState([]);
+  const [pType, setType] = useState(type);
   const isFirstRender = useRef(true);
 
   // Ana tablo için pagination
@@ -62,22 +63,26 @@ const PersonnelTable = ({ type }) => {
   // Personel verisini getirme
   // sayfa açılırken değil sadece çağrıldığı zaman çalışacak
   const getPersonnelData = async () => {
-    const response = await getAssignedPersonalByDutyIdWithPagination(selectedDuty.Duty.duty_id, modalPage + 1, modalRowsPerPage).then(
-      (res) => {
-        return res;
-      }
-    );
+    const response = await GetAssignedPersonalByDutyIdAndTypeWithPagination(
+      selectedDuty.Duty.duty_id,
+      modalPage + 1,
+      modalRowsPerPage,
+      pType
+    ).then((res) => {
+      return res;
+    });
     setPersonnelData(response.data.data);
     setTotalPersonnel(response.data.total);
     // get total from response and set it for pagination
   };
 
-  const resetPaidAssignment = async (dutyId) => {
-    await resetAssignment(dutyId).then((res) => {
+  const resetPaidAssignment = async (dutyId, gettype) => {
+    setType(gettype);
+    await resetAssignment(dutyId, gettype).then((res) => {
       if (res.status === 200) {
         alert('Ödeme başarıyla silindi');
         var dutyDataCopy = [...dutyData];
-        dutyDataCopy = dutyDataCopy.filter((duty) => duty.Duty.duty_id !== dutyId);
+        dutyDataCopy = dutyDataCopy.filter((duty) => duty.Duty.duty_id !== dutyId && duty.Duty.type !== gettype);
         setDutyData(dutyDataCopy);
       } else {
         alert('Ödeme silinirken bir hata oluştu');
@@ -109,6 +114,7 @@ const PersonnelTable = ({ type }) => {
   }, [page, rowsPerPage]);
 
   const handleOpen = async (row) => {
+    setType(row.Duty.type);
     setSelectedDuty(row);
   };
 
@@ -140,9 +146,10 @@ const PersonnelTable = ({ type }) => {
     setDutyCount(response.total);
   };
 
-  const downloadPersonnelReportExcel = async (dutyId) => {
+  const downloadPersonnelReportExcel = async (dutyId, gettype) => {
+    setType(gettype);
     const dutyName = dutyData.find((duty) => duty.Duty.duty_id === dutyId).Duty.duty_description;
-    await downloadPersonnelReport(dutyId, type) // Yanıtı blob olarak al
+    await downloadPersonnelReport(dutyId, gettype) // Yanıtı blob olarak al
       .then((blob) => {
         // Blob'u bir URL'ye çevir
         const url = window.URL.createObjectURL(blob);
@@ -150,7 +157,7 @@ const PersonnelTable = ({ type }) => {
         a.style.display = 'none';
         a.href = url;
         // set filename is dutyId_OdemeListesi.xlsx
-        a.download = `${dutyId}_${dutyName}_OdemeListesi.xlsx`;
+        a.download = `${dutyId}_${getBranchDefinitionByType(gettype)}_${dutyName}_OdemeListesi.xlsx`;
         document.body.appendChild(a);
         a.click(); // Simüle tıklama
         window.URL.revokeObjectURL(url); // URL'i serbest bırak
@@ -255,12 +262,12 @@ const PersonnelTable = ({ type }) => {
                   </Button>
                 </TableCell>
                 <TableCell>
-                  <Button variant="contained" onClick={() => downloadPersonnelReportExcel(row.Duty.duty_id)}>
+                  <Button variant="contained" onClick={() => downloadPersonnelReportExcel(row.Duty.duty_id, row.Duty.type)}>
                     Rapor İndir
                   </Button>
                 </TableCell>
                 <TableCell>
-                  <Button variant="contained" onClick={() => resetPaidAssignment(row.Duty.duty_id)}>
+                  <Button variant="contained" onClick={() => resetPaidAssignment(row.Duty.duty_id, row.Duty.type)}>
                     Ödemeyi Sil
                   </Button>
                 </TableCell>

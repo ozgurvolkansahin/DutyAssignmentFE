@@ -13,10 +13,13 @@ import {
   IconButton,
   Modal,
   Box,
-  TableSortLabel
+  TableSortLabel,
+  Button
 } from '@mui/material';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import { getPersonnel, getPersonnelDuties } from 'services/personnel';
+import DownloadIcon from '@mui/icons-material/Download'; // İndirme iconu için gerekli import
+
+import { getPersonnel, getPersonnelDuties, downloadAllPersonnelWithType } from 'services/personnel';
 import { debounce, set } from 'lodash';
 import { filterPersonnel } from 'services/personnel';
 const modalStyle = {
@@ -48,7 +51,7 @@ const PersonnelTable = ({ type }) => {
   const [modalPage, setModalPage] = useState(0);
   const [modalRowsPerPage, setModalRowsPerPage] = useState(10);
   const [totalDuties, setTotalDuties] = useState(0);
-  const [orderByField, setOrderByField] = useState('');
+  const [orderByField, setOrderByField] = useState('dutiesCount');
   const [dutyCountDirection, setDutyCountDirection] = useState('desc');
 
   const [personnelData, setPersonnelData] = useState([]); // Personel verisi
@@ -133,7 +136,7 @@ const PersonnelTable = ({ type }) => {
     });
   };
   const getPersonnelData = () => {
-    getPersonnel(page + 1, rowsPerPage, type).then((response) => {
+    getPersonnel(page + 1, rowsPerPage, type, dutyCountDirection, orderByField).then((response) => {
       setPersonnelData(response.data);
       setTotalPersonnel(response.total);
     });
@@ -179,174 +182,210 @@ const PersonnelTable = ({ type }) => {
     return ` ${count !== -1 ? count : `more than ${to}`} personelden ${from}–${to} gösteriliyor`;
   }
 
+  async function onPersonnelExcelDownload() {
+    await downloadAllPersonnelWithType(type)
+      // Yanıtı blob olarak al
+      .then((blob) => {
+        // Blob'u bir URL'ye çevir
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        // set filename is dutyId_OdemeListesi.xlsx
+        a.download = `${getBranchDefinitionByType(type)}_PersonelListesi.xlsx`;
+        document.body.appendChild(a);
+        a.click(); // Simüle tıklama
+        window.URL.revokeObjectURL(url); // URL'i serbest bırak
+      })
+      .catch((error) => console.error('Download error:', error)); // Hataları yakala
+  }
+  function getBranchDefinitionByType(type) {
+    // 1: 'Kadro' 2: 'Şube' 3: 'Çevik'
+    switch (type) {
+      case 1:
+        return 'Kadro';
+      case 2:
+        return 'Şube';
+      case 3:
+        return 'Çevik';
+      default:
+        return 'Tanımsız';
+    }
+  }
   return (
-    <TableContainer component={Paper}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Sicil</TableCell>
-            <TableCell>TC Kimlik</TableCell>
-            <TableCell>İsim</TableCell>
-            <TableCell>Rütbe</TableCell>
-            <TableCell>Birim</TableCell>
-            <TableCell>Nokta</TableCell>
-            <TableCell>Grup</TableCell>
-            <TableCell>Cep</TableCell>
-            <TableCell>IBAN</TableCell>
-            <TableCell>
-              <TableSortLabel
-                direction={dutyCountDirection}
-                active={orderByField === 'dutiesCount'}
-                onClick={() => createSortHandler('dutiesCount')}
-              >
-                Görev Sayısı
-              </TableSortLabel>
-            </TableCell>
-            <TableCell>
-              <TableSortLabel
-                direction={dutyCountDirection}
-                active={orderByField === 'paidDutiesCount'}
-                onClick={() => createSortHandler('paidDutiesCount')}
-              >
-                Ödenen Görev Sayısı
-              </TableSortLabel>
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableHead>
-          <TableRow>
-            <TableCell>
-              <Input placeholder="Sicil" name="sicil" value={filters.sicil} onChange={handleFilterChange} />
-            </TableCell>
-            <TableCell>
-              <Input placeholder="TC Kimlik" name="tcKimlik" value={filters.tcKimlik} onChange={handleFilterChange} />
-            </TableCell>
-            <TableCell>
-              <Input placeholder="İsim" name="isim" value={filters.isim} onChange={handleFilterChange} />
-            </TableCell>
-            <TableCell>
-              <Input placeholder="Rütbe" name="rutbe" value={filters.rutbe} onChange={handleFilterChange} />
-            </TableCell>
-            <TableCell>
-              <Input placeholder="Birim" name="birim" value={filters.birim} onChange={handleFilterChange} />
-            </TableCell>
-            <TableCell>
-              <Input placeholder="Nokta" name="nokta" value={filters.nokta} onChange={handleFilterChange} />
-            </TableCell>
-            <TableCell>
-              <Input placeholder="Grup" name="grup" value={filters.grup} onChange={handleFilterChange} />
-            </TableCell>
-            <TableCell>
-              <Input placeholder="Cep" name="tel" value={filters.tel} onChange={handleFilterChange} />
-            </TableCell>
-            <TableCell>
-              <Input placeholder="IBAN" name="iban" value={filters.iban} onChange={handleFilterChange} />
-            </TableCell>
-            <TableCell></TableCell>
-            <TableCell></TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {personnelData &&
-            personnelData.length > 0 &&
-            personnelData.map((person) => (
-              <TableRow key={person.sicil}>
-                <TableCell>{person.sicil}</TableCell>
-                <TableCell>{person.tcKimlik}</TableCell>
-                <TableCell>{`${person.ad} ${person.soyad}`}</TableCell>
-                <TableCell>{person.rutbe}</TableCell>
-                <TableCell>{person.birim}</TableCell>
-                <TableCell>{person.nokta}</TableCell>
-                <TableCell>{person.grup}</TableCell>
-                <TableCell>{person.tel}</TableCell>
-                <TableCell>{person.iban}</TableCell>
-                <TableCell
-                  sx={{
-                    whiteSpace: 'nowrap'
-                  }}
-                >
-                  {person.dutiesCount}{' '}
-                  <Tooltip title="Görevleri görmek için tıklayınız">
-                    <IconButton
-                      onClick={() => {
-                        setTotalDuties(person.dutiesCount);
-                        handleOpenModal(person, false, person.dutiesCount);
-                      }}
-                    >
-                      <HelpOutlineIcon />
-                    </IconButton>
-                  </Tooltip>
-                </TableCell>
-                <TableCell
-                  sx={{
-                    whiteSpace: 'nowrap'
-                  }}
-                >
-                  {person.paidDutiesCount}
-                  <Tooltip title="Görevleri görmek için tıklayınız">
-                    <IconButton
-                      onClick={() => {
-                        setTotalDuties(person.paidDutiesCount);
-                        handleOpenModal(person, true, person.paidDutiesCount);
-                      }}
-                    >
-                      <HelpOutlineIcon />
-                    </IconButton>
-                  </Tooltip>
-                </TableCell>
-              </TableRow>
-            ))}
-        </TableBody>
-      </Table>
-      {/* TablePagination ekleyebilirsiniz */}
-      <TablePagination
-        component="div"
-        count={totalPersonnel}
-        page={page}
-        rowsPerPage={rowsPerPage}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-        labelRowsPerPage="Sayfa Başına Veri Sayısı"
-        labelDisplayedRows={defaultLabelDisplayedRows}
-      />
+    <>
+      <Button onClick={onPersonnelExcelDownload}>
+        İndirmek için tıklayın <DownloadIcon />
+      </Button>
 
-      {/* Modal */}
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Sicil</TableCell>
+              <TableCell>TC Kimlik</TableCell>
+              <TableCell>İsim</TableCell>
+              <TableCell>Rütbe</TableCell>
+              <TableCell>Birim</TableCell>
+              <TableCell>Nokta</TableCell>
+              <TableCell>Grup</TableCell>
+              <TableCell>Cep</TableCell>
+              <TableCell>IBAN</TableCell>
+              <TableCell>
+                <TableSortLabel
+                  direction={dutyCountDirection}
+                  active={orderByField === 'dutiesCount'}
+                  onClick={() => createSortHandler('dutiesCount')}
+                >
+                  Görev Sayısı
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  direction={dutyCountDirection}
+                  active={orderByField === 'paidDutiesCount'}
+                  onClick={() => createSortHandler('paidDutiesCount')}
+                >
+                  Ödenen Görev Sayısı
+                </TableSortLabel>
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableHead>
+            <TableRow>
+              <TableCell>
+                <Input placeholder="Sicil" name="sicil" value={filters.sicil} onChange={handleFilterChange} />
+              </TableCell>
+              <TableCell>
+                <Input placeholder="TC Kimlik" name="tcKimlik" value={filters.tcKimlik} onChange={handleFilterChange} />
+              </TableCell>
+              <TableCell>
+                <Input placeholder="İsim" name="isim" value={filters.isim} onChange={handleFilterChange} />
+              </TableCell>
+              <TableCell>
+                <Input placeholder="Rütbe" name="rutbe" value={filters.rutbe} onChange={handleFilterChange} />
+              </TableCell>
+              <TableCell>
+                <Input placeholder="Birim" name="birim" value={filters.birim} onChange={handleFilterChange} />
+              </TableCell>
+              <TableCell>
+                <Input placeholder="Nokta" name="nokta" value={filters.nokta} onChange={handleFilterChange} />
+              </TableCell>
+              <TableCell>
+                <Input placeholder="Grup" name="grup" value={filters.grup} onChange={handleFilterChange} />
+              </TableCell>
+              <TableCell>
+                <Input placeholder="Cep" name="tel" value={filters.tel} onChange={handleFilterChange} />
+              </TableCell>
+              <TableCell>
+                <Input placeholder="IBAN" name="iban" value={filters.iban} onChange={handleFilterChange} />
+              </TableCell>
+              <TableCell></TableCell>
+              <TableCell></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {personnelData &&
+              personnelData.length > 0 &&
+              personnelData.map((person) => (
+                <TableRow key={person.sicil}>
+                  <TableCell>{person.sicil}</TableCell>
+                  <TableCell>{person.tcKimlik}</TableCell>
+                  <TableCell>{`${person.ad} ${person.soyad}`}</TableCell>
+                  <TableCell>{person.rutbe}</TableCell>
+                  <TableCell>{person.birim}</TableCell>
+                  <TableCell>{person.nokta}</TableCell>
+                  <TableCell>{person.grup}</TableCell>
+                  <TableCell>{person.tel}</TableCell>
+                  <TableCell>{person.iban}</TableCell>
+                  <TableCell
+                    sx={{
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {person.dutiesCount}{' '}
+                    <Tooltip title="Görevleri görmek için tıklayınız">
+                      <IconButton
+                        onClick={() => {
+                          setTotalDuties(person.dutiesCount);
+                          handleOpenModal(person, false, person.dutiesCount);
+                        }}
+                      >
+                        <HelpOutlineIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {person.paidDutiesCount}
+                    <Tooltip title="Görevleri görmek için tıklayınız">
+                      <IconButton
+                        onClick={() => {
+                          setTotalDuties(person.paidDutiesCount);
+                          handleOpenModal(person, true, person.paidDutiesCount);
+                        }}
+                      >
+                        <HelpOutlineIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+        {/* TablePagination ekleyebilirsiniz */}
+        <TablePagination
+          component="div"
+          count={totalPersonnel}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          labelRowsPerPage="Sayfa Başına Veri Sayısı"
+          labelDisplayedRows={defaultLabelDisplayedRows}
+        />
 
-      <Modal open={openModal} onClose={handleCloseModal} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
-        <Box sx={modalStyle}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Görev Numarası</TableCell>
-                <TableCell>Görev Adı</TableCell>
-                <TableCell>Görev Tarihi</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {dutiesData &&
-                dutiesData.length > 0 &&
-                dutiesData.map((duty) => (
-                  <TableRow key={duty.dutyId}>
-                    <TableCell>{duty.dutyId}</TableCell>
-                    <TableCell>{duty.description}</TableCell>
-                    <TableCell>{new Date(duty.date).toLocaleDateString()}</TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-          <TablePagination
-            component="div"
-            count={totalDuties}
-            page={modalPage}
-            rowsPerPage={modalRowsPerPage}
-            onPageChange={(event, newPage) => setModalPage(newPage)}
-            onRowsPerPageChange={(event) => setModalRowsPerPage(parseInt(event.target.value, 10))}
-            labelRowsPerPage="Sayfa Başına Veri Sayısı"
-            labelDisplayedRows={defaultLabelDisplayedRows}
-          />
-        </Box>
-      </Modal>
-    </TableContainer>
+        {/* Modal */}
+
+        <Modal open={openModal} onClose={handleCloseModal} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
+          <Box sx={modalStyle}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Görev Numarası</TableCell>
+                  <TableCell>Görev Adı</TableCell>
+                  <TableCell>Görev Tarihi</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {dutiesData &&
+                  dutiesData.length > 0 &&
+                  dutiesData.map((duty) => (
+                    <TableRow key={duty.dutyId}>
+                      <TableCell>{duty.dutyId}</TableCell>
+                      <TableCell>{duty.description}</TableCell>
+                      <TableCell>{new Date(duty.date).toLocaleDateString()}</TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+            <TablePagination
+              component="div"
+              count={totalDuties}
+              page={modalPage}
+              rowsPerPage={modalRowsPerPage}
+              onPageChange={(event, newPage) => setModalPage(newPage)}
+              onRowsPerPageChange={(event) => setModalRowsPerPage(parseInt(event.target.value, 10))}
+              labelRowsPerPage="Sayfa Başına Veri Sayısı"
+              labelDisplayedRows={defaultLabelDisplayedRows}
+            />
+          </Box>
+        </Modal>
+      </TableContainer>
+    </>
   );
 };
 

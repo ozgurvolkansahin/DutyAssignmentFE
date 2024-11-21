@@ -16,7 +16,7 @@ import React, { useState, useEffect } from 'react';
 import CloseIcon from '@mui/icons-material/Close'; // X iconu için gerekli import
 import DownloadIcon from '@mui/icons-material/Download'; // İndirme iconu için gerekli import
 import ConfirmationModal from './ConfirmationModal';
-import { assignToDuty, getAssignedPersonalByDutyIdWithPagination } from 'services/assignment';
+import { assignToDuty, GetAssignedPersonalByDutyIdAndTypeWithPagination } from 'services/assignment';
 import { downloadPersonnelReport } from 'services/assignment';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
 import { deleteDuty } from 'services/duty';
@@ -100,7 +100,12 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
   };
 
   const getPersonnelData = async () => {
-    const response = await getAssignedPersonalByDutyIdWithPagination(selectedDuty.dutyId, modalPage + 1, modalRowsPerPage).then((res) => {
+    const response = await GetAssignedPersonalByDutyIdAndTypeWithPagination(
+      selectedDuty.dutyId,
+      modalPage + 1,
+      modalRowsPerPage,
+      type
+    ).then((res) => {
       return res;
     });
     setPersonnelData(response.data.data);
@@ -111,6 +116,7 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
   // Atama yap butonu için fonksiyon
   const handleAssignment = async () => {
     // İlgili işlemleri burada yapabilirsiniz
+    const selDuty = selectedDuty;
     const response = await assignToDuty({
       dutyIds: [selectedDuty.dutyId],
       assignmentCount: +assignmentCount,
@@ -121,6 +127,7 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
       })
       .then(() => {
         handleClose(); // Atama yapıldıktan sonra modal kapatılır
+        setSelectedDuty(selDuty);
         getPersonnelData(); // Atama yapıldıktan sonra personel listesini günceller
       })
       .catch((err) => {
@@ -160,11 +167,11 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
   };
 
   const handleDeleteOpen = (duty) => {
-    setSelectedDuty(duty); // Hangi kişiye tıklandığını al
+    setSelectedDuty(duty);
     setDeleteOpen(true);
   };
   const handleDeleteCancel = (duty) => {
-    setSelectedDuty(null); // Hangi kişiye tıklandığını al
+    setSelectedDuty(null);
     setDeleteOpen(false);
   };
 
@@ -172,11 +179,6 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
     setConfirmOpen(false); // Onay modalını kapat
   };
   const handlePersonnelModalClose = () => {
-    // setPersonnelData([]); // Personel listesini temizle
-    // onDeleteDuty(selectedDuty.dutyId); // Atama yapılan görevi ana listeden sil
-    // setSelectedDuty(null);
-    // setPersonnelModalOpen(false); // Onay modalını kapat
-
     window.location.reload();
   };
 
@@ -199,7 +201,7 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
         a.style.display = 'none';
         a.href = url;
         // set filename is dutyId_OdemeListesi.xlsx
-        a.download = `${selectedDuty.dutyId}_OdemeListesi.xlsx`;
+        a.download = `${selectedDuty.dutyId}_${getBranchDefinitionByType(type)}_OdemeListesi.xlsx`;
         document.body.appendChild(a);
         a.click(); // Simüle tıklama
         window.URL.revokeObjectURL(url); // URL'i serbest bırak
@@ -208,6 +210,19 @@ const DutyTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange,
   };
   function defaultLabelDisplayedRows({ from, to, count }) {
     return ` ${count !== -1 ? count : `more than ${to}`} görevden ${from}–${to} gösteriliyor`;
+  }
+  function getBranchDefinitionByType(type) {
+    // 1: 'Kadro' 2: 'Şube' 3: 'Çevik'
+    switch (type) {
+      case 1:
+        return 'Kadro';
+      case 2:
+        return 'Şube';
+      case 3:
+        return 'Çevik';
+      default:
+        return 'Tanımsız';
+    }
   }
   return (
     <TableContainer component={Paper}>

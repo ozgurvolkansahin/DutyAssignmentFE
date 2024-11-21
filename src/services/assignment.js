@@ -47,9 +47,9 @@ export const assignToDuty = async (data) => {
     });
     return res;
 }
-export const getAssignedPersonalByDutyIdWithPagination = async (dutyId,page,pageSize) => {
+export const GetAssignedPersonalByDutyIdAndTypeWithPagination = async (dutyId,page,pageSize, type) => {
     const res = await poster({
-        url: '/assignment/GetAssignedPersonalByDutyIdWithPagination',
+        url: '/assignment/GetAssignedPersonalByDutyIdAndTypeWithPagination',
         config: {
             headers: {
                 'Content-Type': 'application/json'
@@ -58,7 +58,8 @@ export const getAssignedPersonalByDutyIdWithPagination = async (dutyId,page,page
         data: {
             dutyId,
             page,
-            pageSize
+            pageSize,
+            type
     }});
     return res;
 }
@@ -77,9 +78,9 @@ export const getFilteredAssignments = async (filters, page, pageSize) => {
     return res.data;
 }
 
-export const resetAssignment = async (dutyId) => {
+export const resetAssignment = async (dutyId, type) => {
     const res = await fetcher({
-        url: `/assignment/ResetAssignment?dutyId=${dutyId}`,
+        url: `/assignment/ResetAssignment?dutyId=${dutyId}&type=${type}`,
         config: {
             headers: {
                 'Content-Type': 'application/json'
