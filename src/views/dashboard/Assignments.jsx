@@ -82,7 +82,11 @@ const PersonnelTable = ({ type }) => {
       if (res.status === 200) {
         alert('Ödeme başarıyla silindi');
         var dutyDataCopy = [...dutyData];
-        dutyDataCopy = dutyDataCopy.filter((duty) => duty.Duty.duty_id !== dutyId && duty.Duty.type !== gettype);
+        // remove the duty from dutyData
+        // find index of the duty to be removed
+        const index = dutyDataCopy.findIndex((duty) => duty.Duty.duty_id === dutyId && duty.Duty.type === gettype);
+        // remove the duty from the array
+        dutyDataCopy.splice(index, 1);
         setDutyData(dutyDataCopy);
       } else {
         alert('Ödeme silinirken bir hata oluştu');
