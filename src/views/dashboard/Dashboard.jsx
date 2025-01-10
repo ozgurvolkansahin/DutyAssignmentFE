@@ -9,7 +9,7 @@ import Gorevlendirmeler from './Gorevlendirmeler';
 import GorevlendirilmisPersonel from './GorevlendirilmisPersonel';
 import SubeMuduru from './SubeMuduru';
 import SistemSorumlusu from './SistemSorumlusu';
-
+import SorumluMudur from './SorumluMudur';
 import { gridSpacing } from 'store/constant';
 
 // assets
@@ -46,10 +46,19 @@ const Dashboard = () => {
     <Grid container spacing={gridSpacing}>
       <Grid item lg={12} md={12} sm={12} xs={12}>
         <Grid container spacing={gridSpacing}>
-          <Grid item sm={6} xs={12} md={6} lg={6}>
-            <SubeMuduru isLoading={isLoading} />
+          <Grid item sm={4} xs={12} md={4} lg={4}>
+            <SorumluMudur
+              isLoading={isLoading}
+              branchManager={dashboardData.systemResponsible ? dashboardData.systemResponsible.systemAdmins.responsibleManager : ''}
+            />
           </Grid>
-          <Grid item sm={6} xs={12} md={6} lg={6}>
+          <Grid item sm={4} xs={12} md={4} lg={4}>
+            <SubeMuduru
+              isLoading={isLoading}
+              branchManager={dashboardData.systemResponsible ? dashboardData.systemResponsible.systemAdmins.branchManager : ''}
+            />
+          </Grid>
+          <Grid item sm={4} xs={12} md={4} lg={4}>
             <SistemSorumlusu
               {...{
                 isLoading: isLoading,

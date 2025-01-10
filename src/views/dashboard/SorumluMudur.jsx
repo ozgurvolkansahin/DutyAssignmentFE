@@ -9,15 +9,14 @@ import ListItem from '@mui/material/ListItem';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import TotalIncomeCard from 'ui-component/cards/Skeleton/TotalIncomeCard';
-
+import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 // styles
 const CardWrapper = styled(MainCard)(({ theme }) => ({
-  backgroundColor: theme.palette.primary.dark,
-  color: theme.palette.primary.light,
+  backgroundColor: theme.palette.error.dark,
+  color: theme.palette.error.light,
   overflow: 'hidden',
   position: 'relative',
   '&:after': {
@@ -42,7 +41,7 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
   }
 }));
 
-const SubeMuduru = ({ isLoading, branchManager }) => {
+const SorumluMudur = ({ isLoading, branchManager }) => {
   const theme = useTheme();
   return (
     <>
@@ -59,23 +58,23 @@ const SubeMuduru = ({ isLoading, branchManager }) => {
                     sx={{
                       ...theme.typography.commonAvatar,
                       ...theme.typography.largeAvatar,
-                      bgcolor: 'primary.800',
-                      color: '#fff'
+                      bgcolor: 'warning.main',
+                      color: 'error.dark'
                     }}
                   >
-                    <ArrowCircleRightIcon fontSize="inherit" />
+                    <SupervisorAccountIcon fontSize="inherit" />
                   </Avatar>
                 </ListItemAvatar>
                 <ListItemText
                   sx={{ py: 0, my: 0.45 }}
                   primary={
-                    <Typography variant="h4" sx={{ color: '#fff' }}>
+                    <Typography variant="h4" sx={{ color: 'primary.light' }}>
                       {branchManager}
                     </Typography>
                   }
                   secondary={
                     <Typography variant="subtitle2" sx={{ color: 'primary.light', mt: 0.25 }}>
-                      Şube Müdürü
+                      Sorumlu Müdür
                     </Typography>
                   }
                 />
@@ -88,9 +87,9 @@ const SubeMuduru = ({ isLoading, branchManager }) => {
   );
 };
 
-SubeMuduru.propTypes = {
+SorumluMudur.propTypes = {
   isLoading: PropTypes.bool,
   branchManager: PropTypes.string
 };
 
-export default SubeMuduru;
+export default SorumluMudur;
