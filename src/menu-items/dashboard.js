@@ -36,6 +36,14 @@ const dashboard = {
       breadcrumbs: false
     },
     {
+      id: 'cevik',
+      title: 'Çevik',
+      type: 'item',
+      url: '/cevik',
+      icon: icons.IconDashboard,
+      breadcrumbs: false
+    },
+    {
       id: 'assignments',
       title: 'Ödemeler',
       type: 'item',

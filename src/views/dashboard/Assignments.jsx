@@ -11,7 +11,11 @@ import {
   Box,
   TablePagination,
   Paper,
-  Input
+  Input,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl
 } from '@mui/material';
 
 import {
@@ -40,7 +44,8 @@ const modalStyle = {
 const PersonnelTable = ({ type }) => {
   const [filters, setFilters] = useState({
     dutyId: '',
-    dutyDescription: ''
+    dutyDescription: '',
+    type: 0
   });
 
   const [open, setOpen] = useState(false);
@@ -243,10 +248,28 @@ const PersonnelTable = ({ type }) => {
           <TableHead>
             <TableRow>
               <TableCell>
-                <Input placeholder="Görev Numarası" name="dutyId" value={filters.duty_id} onChange={handleFilterChange} />
+                <Input placeholder="Görev Numarası" name="dutyId" value={filters.dutyId} onChange={handleFilterChange} />
               </TableCell>
               <TableCell>
-                <Input placeholder="Açıklama" name="dutyDescription" value={filters.duty_description} onChange={handleFilterChange} />
+                <Input placeholder="Açıklama" name="dutyDescription" value={filters.dutyDescription} onChange={handleFilterChange} />
+              </TableCell>
+              <TableCell sx={{ minWidth: 120 }}>
+                <FormControl fullWidth>
+                  <InputLabel id="type-select-label">Tip</InputLabel>
+                  <Select
+                    labelId="type-select-label"
+                    label="Tip"
+                    id="type-select"
+                    name="type"
+                    value={filters.type}
+                    onChange={handleFilterChange}
+                  >
+                    <MenuItem value={0}>Hepsi</MenuItem>
+                    <MenuItem value={1}>Kadro</MenuItem>
+                    <MenuItem value={2}>Şube</MenuItem>
+                    <MenuItem value={3}>Çevik</MenuItem>
+                  </Select>
+                </FormControl>
               </TableCell>
             </TableRow>
           </TableHead>

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { useEffect, useState } from 'react';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -28,8 +29,14 @@ const Gorevlendirmeler = ({ isLoading, totalDuties, subText, showUploader, branc
   showUploader = showUploader == undefined ? false : showUploader;
   const theme = useTheme();
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  // const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [submenuAnchorEl, setSubmenuAnchorEl] = useState(null);
+  const [submenuPaymentAnchorEl, setSubmenuPaymentAnchorEl] = useState(null);
 
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -37,6 +44,27 @@ const Gorevlendirmeler = ({ isLoading, totalDuties, subText, showUploader, branc
   const handleClose = () => {
     setAnchorEl(false);
   };
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setSubmenuAnchorEl(null);
+  };
+
+  const handleProcessSubmenuOpen = (event) => {
+    setSubmenuAnchorEl(event.currentTarget);
+  };
+
+  const handleSubmenuClose = () => {
+    setSubmenuAnchorEl(null);
+  };
+
+  const handlePaymentSubmenuOpen = (event) => {
+    setSubmenuPaymentAnchorEl(event.currentTarget);
+  };
+
+  const handleSubmenuPaymentClose = () => {
+    setSubmenuPaymentAnchorEl(null);
+  };
+
   const processDuties = (type) => {
     // call insertDuties function
     insertDuties(type)
@@ -147,7 +175,7 @@ const Gorevlendirmeler = ({ isLoading, totalDuties, subText, showUploader, branc
                         anchorEl={anchorEl}
                         keepMounted
                         open={Boolean(anchorEl)}
-                        onClose={handleClose}
+                        onClose={handleMenuClose}
                         variant="selectedMenu"
                         anchorOrigin={{
                           vertical: 'bottom',
@@ -158,26 +186,62 @@ const Gorevlendirmeler = ({ isLoading, totalDuties, subText, showUploader, branc
                           horizontal: 'right'
                         }}
                       >
-                        <MenuItem>
-                          <Button onClick={() => processDuties(1)}>
-                            <GetAppTwoToneIcon sx={{ mr: 1.75 }} /> Kadro Görevlerini İşle
-                          </Button>
-                        </MenuItem>
-                        <MenuItem>
-                          <Button onClick={() => processDuties(2)}>
-                            <GetAppTwoToneIcon sx={{ mr: 1.75 }} /> Şube Görevlerini İşle
-                          </Button>
-                        </MenuItem>
-                        <MenuItem>
-                          <Button onClick={() => processDuties(3)}>
-                            <GetAppTwoToneIcon sx={{ mr: 1.75 }} /> Çevik Görevlerini İşle
-                          </Button>
-                        </MenuItem>
-                        <MenuItem>
-                          <Button onClick={processPayments}>
-                            <GetAppTwoToneIcon sx={{ mr: 1.75 }} /> Ödemeleri İşle
-                          </Button>
-                        </MenuItem>
+                        <MenuItem onClick={handleProcessSubmenuOpen}>Görevleri İşle</MenuItem>
+                        <MenuItem onClick={handlePaymentSubmenuOpen}>Ödemeleri İşle</MenuItem>
+
+                        <Menu
+                          id="submenu-duties"
+                          anchorEl={submenuAnchorEl}
+                          keepMounted
+                          open={Boolean(submenuAnchorEl)}
+                          onClose={handleSubmenuClose}
+                          anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'right'
+                          }}
+                          transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right'
+                          }}
+                        >
+                          <MenuItem>
+                            <Button onClick={() => processDuties(1)}>
+                              <GetAppTwoToneIcon sx={{ mr: 1.75 }} /> Kadro Görevlerini İşle
+                            </Button>
+                          </MenuItem>
+                          <MenuItem>
+                            <Button onClick={() => processDuties(2)}>
+                              <GetAppTwoToneIcon sx={{ mr: 1.75 }} /> Şube Görevlerini İşle
+                            </Button>
+                          </MenuItem>
+                          <MenuItem>
+                            <Button onClick={() => processDuties(3)}>
+                              <GetAppTwoToneIcon sx={{ mr: 1.75 }} /> Çevik Görevlerini İşle
+                            </Button>
+                          </MenuItem>
+                        </Menu>
+
+                        <Menu
+                          id="submenu-paymentduties"
+                          anchorEl={submenuPaymentAnchorEl}
+                          keepMounted
+                          open={Boolean(submenuPaymentAnchorEl)}
+                          onClose={handleSubmenuPaymentClose}
+                          anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'right'
+                          }}
+                          transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right'
+                          }}
+                        >
+                          <MenuItem>
+                            <Button onClick={processPayments}>
+                              <GetAppTwoToneIcon sx={{ mr: 1.75 }} /> Ödemeleri İşle
+                            </Button>
+                          </MenuItem>
+                        </Menu>
                       </Menu>
                     </Grid>
                   )}

@@ -46,6 +46,15 @@ const MainRoutes = {
       ]
     },
     {
+      path: 'cevik',
+      children: [
+        {
+          path: '',
+          element: <KadroDefault key={3} type={3} />
+        }
+      ]
+    },
+    {
       path: 'assignments',
       children: [
         {

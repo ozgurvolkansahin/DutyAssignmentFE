@@ -98,7 +98,7 @@ const Dashboard = () => {
           <Grid item lg={4} md={6} sm={4} xs={12}>
             <Gorevlendirmeler
               branch="Şube"
-              showUploader={true}
+              showUploader={false}
               isLoading={isLoading}
               totalDuties={branchInfo('Şube').totalDuties}
               subText={`${branchInfo('Şube').totalAssignedPersonal} Görevlendirme`}
@@ -121,7 +121,7 @@ const Dashboard = () => {
           <Grid item lg={4} md={6} sm={4} xs={12}>
             <Gorevlendirmeler
               branch="Çevik"
-              showUploader={true}
+              showUploader={false}
               isLoading={isLoading}
               totalDuties={branchInfo('Çevik').totalDuties}
               subText={`${branchInfo('Çevik').totalAssignedPersonal} Görevlendirme`}
