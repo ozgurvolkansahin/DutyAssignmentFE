@@ -1,9 +1,11 @@
 import dashboard from './dashboard';
-import other from './other';
+import payment from './payment';
+import personnel from './personnel';
+import tasks from './tasks';
 // ==============================|| MENU ITEMS ||============================== //
 
 const menuItems = {
-  items: [dashboard]
+  items: [dashboard, payment, tasks, personnel]
 };
 
 export default menuItems;

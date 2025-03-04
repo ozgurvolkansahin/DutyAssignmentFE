@@ -6,20 +6,20 @@ const icons = { IconDashboard };
 
 // ==============================|| DASHBOARD MENU ITEMS ||============================== //
 
-const dashboard = {
-  id: 'dashboard',
-  title: 'Anasayfa',
+const payment = {
+  id: 'payment',
+  title: 'Ödemeler',
   type: 'group',
   children: [
     {
-      id: '',
-      title: 'Anasayfa',
+      id: 'assignments',
+      title: 'Ödemeler',
       type: 'item',
-      url: '/dashboard',
+      url: '/assignments',
       icon: icons.IconDashboard,
       breadcrumbs: false
     }
   ]
 };
 
-export default dashboard;
+export default payment;
