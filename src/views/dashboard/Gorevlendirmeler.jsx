@@ -145,7 +145,8 @@ const Gorevlendirmeler = ({ isLoading, totalDuties, subText, showUploader, branc
                         ...theme.typography.commonAvatar,
                         ...theme.typography.largeAvatar,
                         bgcolor: 'secondary.800',
-                        mt: 1
+                        mt: 1,
+                        cursor: 'default'
                       }}
                     >
                       <img src={EarningIcon} alt="Notification" />

@@ -9,7 +9,6 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 
-
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import SkeletonTotalOrderCard from 'ui-component/cards/Skeleton/EarningCard';
@@ -79,7 +78,8 @@ const GorevlendirilmisPersonel = ({ isLoading, totalAssignments }) => {
                         ...theme.typography.largeAvatar,
                         bgcolor: 'primary.800',
                         color: '#fff',
-                        mt: 1
+                        mt: 1,
+                        cursor: 'default'
                       }}
                     >
                       <PersonIcon fontSize="inherit" />
@@ -97,7 +97,9 @@ const GorevlendirilmisPersonel = ({ isLoading, totalAssignments }) => {
                         ) : (
                           <Typography sx={{ fontSize: '2.125rem', fontWeight: 500, mr: 1, mt: 1.75, mb: 0.75 }}>$961</Typography>
                         )} */}
-                        <Typography sx={{ fontSize: '2.125rem', fontWeight: 500, mr: 1, mt: 1.75, mb: 0.75 }}>{totalAssignments}</Typography>
+                        <Typography sx={{ fontSize: '2.125rem', fontWeight: 500, mr: 1, mt: 1.75, mb: 0.75 }}>
+                          {totalAssignments}
+                        </Typography>
                       </Grid>
                       <Grid item>
                         <Avatar

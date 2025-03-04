@@ -60,7 +60,8 @@ const SubeMuduru = ({ isLoading, branchManager }) => {
                       ...theme.typography.commonAvatar,
                       ...theme.typography.largeAvatar,
                       bgcolor: 'primary.800',
-                      color: '#fff'
+                      color: '#fff',
+                      cursor: 'default'
                     }}
                   >
                     <ArrowCircleRightIcon fontSize="inherit" />

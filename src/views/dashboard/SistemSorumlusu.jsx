@@ -61,7 +61,8 @@ const SistemSorumlusu = ({ isLoading, total, icon, label }) => {
                       ...theme.typography.commonAvatar,
                       ...theme.typography.largeAvatar,
                       bgcolor: 'warning.light',
-                      color: label === 'Meeting attends' ? 'error.dark' : 'warning.dark'
+                      color: label === 'Meeting attends' ? 'error.dark' : 'warning.dark',
+                      cursor: 'default'
                     }}
                   >
                     {icon}

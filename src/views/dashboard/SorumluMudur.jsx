@@ -59,7 +59,8 @@ const SorumluMudur = ({ isLoading, branchManager }) => {
                       ...theme.typography.commonAvatar,
                       ...theme.typography.largeAvatar,
                       bgcolor: 'warning.main',
-                      color: 'error.dark'
+                      color: 'error.dark',
+                      cursor: 'default'
                     }}
                   >
                     <SupervisorAccountIcon fontSize="inherit" />
