@@ -81,9 +81,9 @@ const Gorevlendirmeler = ({ isLoading, totalDuties, subText, showUploader, branc
         setAnchorEl(false);
       });
   };
-  const processPayments = () => {
+  const processPayments = (type) => {
     // call insertDuties function
-    insertPayments()
+    insertPayments(type)
       .then((response) => {
         if (response.status === 200) {
           // reload page
@@ -238,8 +238,21 @@ const Gorevlendirmeler = ({ isLoading, totalDuties, subText, showUploader, branc
                           }}
                         >
                           <MenuItem>
-                            <Button onClick={processPayments}>
-                              <GetAppTwoToneIcon sx={{ mr: 1.75 }} /> Ödemeleri İşle
+                            <Button onClick={() => processPayments(1)}>
+                              <GetAppTwoToneIcon sx={{ mr: 1.75 }} />
+                              Kadro Ödemelerini İşle
+                            </Button>
+                          </MenuItem>
+                          <MenuItem>
+                            <Button onClick={() => processPayments(2)}>
+                              <GetAppTwoToneIcon sx={{ mr: 1.75 }} />
+                              Şube Ödemelerini İşle
+                            </Button>
+                          </MenuItem>
+                          <MenuItem>
+                            <Button onClick={() => processPayments(3)}>
+                              <GetAppTwoToneIcon sx={{ mr: 1.75 }} />
+                              Çevik Şube Ödemelerini İşle
                             </Button>
                           </MenuItem>
                         </Menu>
