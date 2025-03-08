@@ -91,9 +91,9 @@ export const resetAssignment = async (dutyId, type) => {
     return res;
 }
 
-export const insertPayments = async () => {
+export const insertPayments = async (type) => {
     const res = await fetcher({
-        url: '/assignment/ProcessPaidDuties',
+        url: `/assignment/ProcessPaidDuties?type=${type}`,
         config: {
             headers: {
                 'Content-Type': 'application/json'
