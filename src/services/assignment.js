@@ -47,7 +47,7 @@ export const assignToDuty = async (data) => {
     });
     return res;
 }
-export const GetAssignedPersonalByDutyIdAndTypeWithPagination = async (dutyId,page,pageSize, type) => {
+export const GetAssignedPersonalByDutyIdAndTypeWithPagination = async (dutyId,page,pageSize, type, isAll=false) => {
     const res = await poster({
         url: '/assignment/GetAssignedPersonalByDutyIdAndTypeWithPagination',
         config: {
@@ -59,7 +59,8 @@ export const GetAssignedPersonalByDutyIdAndTypeWithPagination = async (dutyId,pa
             dutyId,
             page,
             pageSize,
-            type
+            type,
+            isAll
     }});
     return res;
 }

@@ -51,6 +51,7 @@ const PersonnelTable = ({ type }) => {
   const [open, setOpen] = useState(false);
   const [personnelData, setPersonnelData] = useState([]);
   const [selectedDuty, setSelectedDuty] = useState(null);
+  const [isAll, setIsAll] = useState(false);
   const [dutyData, setDutyData] = useState([]);
   const [pType, setType] = useState(type);
   const isFirstRender = useRef(true);
@@ -72,7 +73,8 @@ const PersonnelTable = ({ type }) => {
       selectedDuty.Duty.duty_id,
       modalPage + 1,
       modalRowsPerPage,
-      pType
+      pType,
+      isAll
     ).then((res) => {
       return res;
     });
@@ -124,9 +126,14 @@ const PersonnelTable = ({ type }) => {
 
   const handleOpen = async (row) => {
     setType(row.Duty.type);
+    setIsAll(false);
     setSelectedDuty(row);
   };
-
+  const handleOpenAll = async (row) => {
+    setType(row.Duty.type);
+    setIsAll(true);
+    setSelectedDuty(row);
+  };
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
@@ -183,6 +190,9 @@ const PersonnelTable = ({ type }) => {
   const handleClose = () => {
     setSelectedDuty(null);
     setOpen(false);
+    setPersonnelData([]);
+    setModalPage(0);
+    setModalRowsPerPage(10);
   };
 
   // Ana tablo için sayfa değişimi
@@ -241,8 +251,10 @@ const PersonnelTable = ({ type }) => {
               <TableCell>Sorumlu Personel</TableCell>
               <TableCell>Görevli Personel</TableCell>
               <TableCell>Ücret Ödenen Personel</TableCell>
-              <TableCell></TableCell>
-              <TableCell></TableCell>
+              <TableCell>Görevli Personel</TableCell>
+              <TableCell>Ödeme Yapılan Personel</TableCell>
+              <TableCell>Rapor</TableCell>
+              <TableCell>Sil</TableCell>
             </TableRow>
           </TableHead>
           <TableHead>
@@ -284,8 +296,13 @@ const PersonnelTable = ({ type }) => {
                 <TableCell>{row.PoliceAttendantsCount}</TableCell>
                 <TableCell>{row.PaidPersonalCount}</TableCell>
                 <TableCell>
+                  <Button variant="contained" onClick={() => handleOpenAll(row)}>
+                    Görevli Personel
+                  </Button>
+                </TableCell>
+                <TableCell>
                   <Button variant="contained" onClick={() => handleOpen(row)}>
-                    Personeli Göster
+                    Ödeme Yapılan Personel
                   </Button>
                 </TableCell>
                 <TableCell>
